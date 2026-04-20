@@ -9,4 +9,11 @@
   --color-border: #6a5a4f;
   --font-family-body: "Lora", "Times New Roman", Times, serif;
   --font-family-display: "Cormorant Garamond", Georgia, serif;
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --radius-card: 0.5rem;
+  --page-max-width: 72rem;
 }

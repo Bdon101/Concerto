@@ -6,25 +6,66 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/reset.css">
   <link rel="stylesheet" href="/styles/tokens.css">
   <link rel="stylesheet" href="/styles/page.css">
+  <link rel="stylesheet" href="/styles/layout.css">
 </head>
 <body>
-  <h1>Concerto</h1>
-  <p>A scrapbook of concerts I have attended.</p>
+  <header class="site-header">
+    <div class="site-brand">
+      <a class="site-name" href="/index.html">Concerto</a>
+      <p class="site-tagline">Concert memory tracker</p>
+    </div>
+    <div class="site-header-meta">
+      <p class="page-tag">Archive</p>
+      <nav class="site-nav">
+        <a href="/index.html">All shows</a>
+      </nav>
+    </div>
+  </header>
 
-  <h2>Shows</h2>
-  <ul>
-    <li>
-      <a href="shows/grent-perez-fonda-2023.html">
-        Grent Perez — November 16, 2023 — Fonda Theater
-      </a>
-    </li>
-    <li>
-      <a href="shows/aespa-kia-forum-2025.html">
-        aespa — February 1, 2025 — Kia Forum
-      </a>
-    </li>
-  </ul>
+  <main class="page-grid">
+    <section class="page-main">
+      <section class="card">
+        <h1>Concert Archive</h1>
+        <p>A scrapbook of concerts I have attended.</p>
+      </section>
+
+      <section class="card">
+        <h2>Shows</h2>
+        <ul class="show-list">
+          <li class="card show-card">
+            <a href="/shows/grent-perez-fonda-2023.html">Grent Perez</a>
+            <p class="show-date">November 16, 2023</p>
+            <p class="show-place">Fonda Theater</p>
+          </li>
+          <li class="card show-card">
+            <a href="/shows/aespa-kia-forum-2025.html">aespa</a>
+            <p class="show-date">February 1, 2025</p>
+            <p class="show-place">Kia Forum</p>
+          </li>
+        </ul>
+      </section>
+    </section>
+
+    <aside class="page-side">
+      <section class="card">
+        <h2>Scrapbook Notes</h2>
+        <p>Theme: moody vintage scrapbook.</p>
+        <p>Saved shows: 2</p>
+      </section>
+
+      <section class="card">
+        <h2>Browse Details</h2>
+        <ul class="stack-list">
+          <li><a href="/artists/grent-perez.html">Grent Perez</a></li>
+          <li><a href="/artists/aespa.html">aespa</a></li>
+          <li><a href="/venues/fonda-theater.html">Fonda Theater</a></li>
+          <li><a href="/venues/kia-forum.html">Kia Forum</a></li>
+        </ul>
+      </section>
+    </aside>
+  </main>
 </body>
 </html>

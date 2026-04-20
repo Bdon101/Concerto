@@ -6,21 +6,64 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/reset.css">
   <link rel="stylesheet" href="/styles/tokens.css">
   <link rel="stylesheet" href="/styles/page.css">
+  <link rel="stylesheet" href="/styles/layout.css">
 </head>
 <body>
-  <h1>Grent Perez at Fonda Theater</h1>
-  <p><svg class="icon" aria-hidden="true"><use href="/icons/show-details.svg#icon-artist" /></svg>Artist: <a href="../artists/grent-perez.html">Grent Perez</a></p>
-  <p>Date: <time datetime="2023-11-16">November 16, 2023</time></p>
-  <p><svg class="icon" aria-hidden="true"><use href="/icons/show-details.svg#icon-venue" /></svg>Venue: <a href="../venues/fonda-theater.html">Fonda Theater</a></p>
+  <header class="site-header">
+    <div class="site-brand">
+      <a class="site-name" href="/index.html">Concerto</a>
+      <p class="site-tagline">Concert memory tracker</p>
+    </div>
+    <div class="site-header-meta">
+      <p class="page-tag">Show</p>
+      <nav class="site-nav">
+        <a href="/index.html">Archive</a>
+      </nav>
+    </div>
+  </header>
 
-  <h2>Related Pages</h2>
-  <ul>
-    <li><svg class="icon" aria-hidden="true"><use href="/icons/show-details.svg#icon-setlist" /></svg><a href="../setlists/grent-perez-fonda-2023-setlist.html">Setlist</a></li>
-    <li><svg class="icon" aria-hidden="true"><use href="/icons/show-details.svg#icon-memory" /></svg><a href="../memories/grent-perez-fonda-2023-memory.html">Memory</a></li>
-  </ul>
+  <main class="page-grid">
+    <section class="page-main">
+      <section class="card">
+        <h1>Grent Perez at Fonda Theater</h1>
+        <ul class="detail-list">
+          <li class="detail-item">
+            <span class="detail-label"><svg class="icon" aria-hidden="true"><use href="/icons/show-details.svg#icon-artist" /></svg>Artist</span>
+            <a href="/artists/grent-perez.html">Grent Perez</a>
+          </li>
+          <li class="detail-item">
+            <span class="detail-label">Date</span>
+            <time datetime="2023-11-16">November 16, 2023</time>
+          </li>
+          <li class="detail-item">
+            <span class="detail-label"><svg class="icon" aria-hidden="true"><use href="/icons/show-details.svg#icon-venue" /></svg>Venue</span>
+            <a href="/venues/fonda-theater.html">Fonda Theater</a>
+          </li>
+        </ul>
+      </section>
 
-  <p><a href="../index.html">Back to Home</a></p>
+      <section class="card">
+        <h2>Related Pages</h2>
+        <ul class="stack-list">
+          <li><svg class="icon" aria-hidden="true"><use href="/icons/show-details.svg#icon-setlist" /></svg><a href="/setlists/grent-perez-fonda-2023-setlist.html">Setlist</a></li>
+          <li><svg class="icon" aria-hidden="true"><use href="/icons/show-details.svg#icon-memory" /></svg><a href="/memories/grent-perez-fonda-2023-memory.html">Memory</a></li>
+        </ul>
+      </section>
+    </section>
+
+    <aside class="page-side">
+      <section class="card">
+        <h2>Show Snapshot</h2>
+        <div class="meta-list">
+          <p class="meta-line"><span class="meta-label">Type:</span> Show</p>
+          <p class="meta-line"><span class="meta-label">City:</span> Los Angeles</p>
+          <p class="meta-line"><a href="/index.html">Back to archive</a></p>
+        </div>
+      </section>
+    </aside>
+  </main>
 </body>
 </html>
