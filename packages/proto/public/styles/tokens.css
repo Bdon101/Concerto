@@ -4,6 +4,7 @@
   --color-surface: #e2d3bb;
   --color-text: #2b2422;
   --color-text-inverted: #f8f2e8;
+  --color-heading: #2f2928;
   --color-link: #7a2f3b;
   --color-accent: #8f7b3d;
   --color-border: #6a5a4f;
@@ -16,4 +17,16 @@
   --space-5: 2rem;
   --radius-card: 0.5rem;
   --page-max-width: 72rem;
+}
+
+body.dark-mode {
+  --color-background-page: #1c1716;
+  --color-background-header: #120f0f;
+  --color-surface: #2b2321;
+  --color-text: #f1e5d5;
+  --color-text-inverted: #f8f2e8;
+  --color-heading: #f6e7d4;
+  --color-link: #d2b16e;
+  --color-accent: #b66b66;
+  --color-border: #8d7162;
 }

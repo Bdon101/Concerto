@@ -4,10 +4,11 @@ body {
   font-family: var(--font-family-body);
   font-size: 1rem;
   font-weight: 400;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 h1 {
-  color: var(--color-background-header);
+  color: var(--color-heading);
   font-family: var(--font-family-display);
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
@@ -50,6 +51,18 @@ a {
 .page-tag {
   font-family: var(--font-family-display);
   font-size: 1.1rem;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-inverted);
+  cursor: pointer;
+}
+
+.mode-toggle input {
+  accent-color: var(--color-accent);
 }
 
 .show-date,
