@@ -55,18 +55,11 @@ body {
   border-radius: var(--radius-card);
 }
 
-.show-list,
 .stack-list,
 .detail-list {
   list-style: none;
   padding: 0;
   max-width: none;
-}
-
-.show-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--space-4);
 }
 
 .stack-list,
@@ -111,9 +104,5 @@ body {
   .page-main,
   .page-side {
     grid-column: span 8;
-  }
-
-  .show-list {
-    grid-template-columns: 1fr;
   }
 }
