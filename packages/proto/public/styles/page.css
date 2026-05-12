@@ -65,15 +65,11 @@ a {
   accent-color: var(--color-accent);
 }
 
-.show-date,
-.show-place,
 .detail-label,
 .meta-label {
   font-weight: 700;
 }
 
-.show-date,
-.show-place,
 .meta-line {
   font-size: 0.95rem;
 }
