@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register — Concerto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/reset.css">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/page.css">
+  <link rel="stylesheet" href="/styles/layout.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "@unbndl/auth": "https://unpkg.com/@unbndl/auth",
+      "@unbndl/html": "https://unpkg.com/@unbndl/html",
+      "@unbndl/view": "https://unpkg.com/@unbndl/view"
+    }
+  }
+  </script>
+  <script type="module">
+    import { define } from "@unbndl/html";
+    import { Auth } from "@unbndl/auth";
+    import { LoginFormElement } from "/js/login-form.js";
+
+    define({
+      "auth-provider": Auth.Provider,
+      "login-form": LoginFormElement
+    });
+  </script>
+</head>
+<body>
+  <auth-provider>
+    <main class="page-grid">
+      <section class="page-main">
+        <section class="card">
+          <h1>Create an account</h1>
+          <login-form api="/auth/register">
+            <label>
+              <span>Username</span>
+              <input name="username" autocomplete="username" />
+            </label>
+            <label>
+              <span>Password</span>
+              <input type="password" name="password" autocomplete="new-password" />
+            </label>
+            <span slot="submit-label">Register</span>
+          </login-form>
+          <p>Already have an account? <a href="/login.html">Sign in</a></p>
+        </section>
+      </section>
+    </main>
+  </auth-provider>
+</body>
+</html>
