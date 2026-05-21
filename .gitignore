@@ -1,0 +1,19 @@
+node_modules
+dist
+
+# Environment files (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Build / OS / editor noise
+.DS_Store
+*.log
+proto.log
+nohup.out
+
+# Local Claude / dev tooling
+.claude/
+.playwright-cli/
+.playwright-mcp/
+outputs/

@@ -1,26 +1,29 @@
+import { Schema, model } from "mongoose";
 import { Show } from "../models/index.ts";
 
-const shows: Record<string, Show> = {
-  "grent-perez-fonda-2023": {
-    id: "grent-perez-fonda-2023",
-    title: "Grent Perez",
-    date: "November 16, 2023",
-    datetime: "2023-11-16",
-    venue: "Fonda Theater",
-    href: "/shows/grent-perez-fonda-2023.html"
+const showSchema = new Schema<Show>(
+  {
+    id: { type: String, required: true, unique: true },
+    title: { type: String, required: true },
+    date: String,
+    datetime: String,
+    venue: String,
+    href: String
   },
-  "aespa-kia-forum-2025": {
-    id: "aespa-kia-forum-2025",
-    title: "aespa",
-    date: "February 1, 2025",
-    datetime: "2025-02-01",
-    venue: "Kia Forum",
-    href: "/shows/aespa-kia-forum-2025.html"
-  }
-};
+  { collection: "concerto_shows" }
+);
 
-function get(id: string): Show | undefined {
-  return shows[id];
+const ShowModel = model<Show>("Show", showSchema);
+
+function index(): Promise<Show[]> {
+  return ShowModel.find();
 }
 
-export default { get };
+function get(id: string): Promise<Show | null> {
+  return ShowModel.findOne({ id })
+    .catch((err) => {
+      throw `Show ${id} not found`;
+    });
+}
+
+export default { index, get };

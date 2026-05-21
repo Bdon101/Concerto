@@ -1,5 +1,8 @@
 import express, { Request, Response } from "express";
 import Shows from "./services/show-svc.ts";
+import { connect } from "./services/mongo.ts";
+
+connect("concerto");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,14 +17,12 @@ app.get("/hello", (_req: Request, res: Response) => {
 
 app.get("/api/shows/:id", (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
-  const data = Shows.get(id);
-
-  if (data) {
-    res.send(data);
-    return;
-  }
-
-  res.status(404).send();
+  Shows.get(id)
+    .then((data) => {
+      if (data) res.send(data);
+      else res.status(404).send();
+    })
+    .catch(() => res.status(404).send());
 });
 
 app.listen(port, () => {
