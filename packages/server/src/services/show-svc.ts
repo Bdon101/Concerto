@@ -20,10 +20,27 @@ function index(): Promise<Show[]> {
 }
 
 function get(id: string): Promise<Show | null> {
-  return ShowModel.findOne({ id })
-    .catch((err) => {
-      throw `Show ${id} not found`;
-    });
+  return ShowModel.findOne({ id });
 }
 
-export default { index, get };
+function create(json: Show): Promise<Show> {
+  const s = new ShowModel(json);
+  return s.save();
+}
+
+function update(id: string, show: Show): Promise<Show> {
+  return ShowModel.findOneAndUpdate({ id }, show, { new: true }).then(
+    (updated) => {
+      if (!updated) throw `${id} not updated`;
+      return updated as Show;
+    }
+  );
+}
+
+function remove(id: string): Promise<void> {
+  return ShowModel.findOneAndDelete({ id }).then((deleted) => {
+    if (!deleted) throw `${id} not deleted`;
+  });
+}
+
+export default { index, get, create, update, remove };
