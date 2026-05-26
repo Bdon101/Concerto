@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "preserve",
+    "allowImportingTsExtensions": true,
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "rootDir": "./src",
+    "outDir": "./dist"
+  },
+  "include": ["src"],
+  "lib": ["ESNext", "DOM", "DOM.Iterable"]
+}

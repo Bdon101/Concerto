@@ -1,0 +1,20 @@
+{
+  "shows": [
+    {
+      "id": "grent-perez-fonda-2023",
+      "href": "/shows/grent-perez-fonda-2023.html",
+      "datetime": "2023-11-16",
+      "title": "Grent Perez",
+      "date": "November 16, 2023",
+      "venue": "Fonda Theater"
+    },
+    {
+      "id": "aespa-kia-forum-2025",
+      "href": "/shows/aespa-kia-forum-2025.html",
+      "datetime": "2025-02-01",
+      "title": "aespa",
+      "date": "February 1, 2025",
+      "venue": "Kia Forum"
+    }
+  ]
+}
