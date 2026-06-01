@@ -1,31 +1,25 @@
 import { html, shadow } from "@unbndl/html";
+import { createViewModel } from "@unbndl/view";
+import { Store, fromStore } from "@unbndl/store";
+import { Show } from "server/models";
+import { Model } from "../model.ts";
 
-type Show = {
-  id: string;
-  title: string;
-  date: string;
-  datetime: string;
-  venue: string;
-  href: string;
-};
+interface HomeVM {
+  shows?: Show[];
+}
 
 export class HomeViewElement extends HTMLElement {
-  constructor() {
-    super();
-    shadow(this).replace(html`<p>Loading…</p>`);
-    this.hydrate();
-  }
+  viewModel = createViewModel<HomeVM>({})
+    .with(fromStore<Model>(this), "shows");
 
-  hydrate() {
-    fetch("/data/shows.json")
-      .then((r) => r.json())
-      .then((data: { shows: Show[] }) => {
-        const view = html`
-          <section>
-            <h1>Concerts</h1>
-            <ul>
-              ${data.shows.map(
-                (s) => html`
+  view = html`
+    <section>
+      <h1>Concerts</h1>
+      <ul>
+        ${($: HomeVM) =>
+          $.shows
+            ? $.shows.map(
+                (s: Show) => html`
                   <li>
                     <a href=${`/app/shows/${s.id}`}>${s.title}</a>
                     —
@@ -33,16 +27,18 @@ export class HomeViewElement extends HTMLElement {
                     at ${s.venue}
                   </li>
                 `
-              )}
-            </ul>
-          </section>
-        `;
-        shadow(this).replace(view);
-      })
-      .catch((err) => {
-        shadow(this).replace(
-          html`<p>Error loading shows: ${err.message}</p>`
-        );
-      });
+              )
+            : html`<li>Loading…</li>`}
+      </ul>
+    </section>
+  `;
+
+  constructor() {
+    super();
+    shadow(this).replace(this.viewModel.render(this.view));
+  }
+
+  connectedCallback() {
+    Store.dispatch(this, ["shows/request"]);
   }
 }

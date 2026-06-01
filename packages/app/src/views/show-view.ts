@@ -1,59 +1,62 @@
 import { html, shadow } from "@unbndl/html";
+import { createViewModel } from "@unbndl/view";
+import { Store, fromStore } from "@unbndl/store";
+import { Show } from "server/models";
+import { Model } from "../model.ts";
 
-type Show = {
-  id: string;
-  title: string;
-  date: string;
-  datetime: string;
-  venue: string;
-  href: string;
-};
+interface ShowVM {
+  show?: Show;
+  showId?: string;
+}
 
 export class ShowViewElement extends HTMLElement {
   static observedAttributes = ["show-id"];
 
+  viewModel = createViewModel<ShowVM>({})
+    .with(fromStore<Model>(this), "show");
+
+  view = html`
+    <article>
+      ${($: ShowVM) => {
+        if (!$.showId) return html`<p>No show selected.</p>`;
+        if (!$.show || $.show.id !== $.showId)
+          return html`<p>Loading…</p>`;
+        return html`
+          <h1>${$.show.title}</h1>
+          <p><time datetime=${$.show.datetime}>${$.show.date}</time></p>
+          <p>${$.show.venue}</p>
+        `;
+      }}
+      <p><a href="/app">← Back to all shows</a></p>
+    </article>
+  `;
+
   constructor() {
     super();
-    shadow(this).replace(html`<p>Loading…</p>`);
+    shadow(this).replace(this.viewModel.render(this.view));
   }
 
   attributeChangedCallback(
     name: string,
-    _oldValue: string | null,
+    _: string | null,
     newValue: string | null
   ) {
-    if (name === "show-id" && newValue) {
-      this.hydrate(newValue);
+    if (name === "show-id") {
+      const id = newValue || undefined;
+      this.viewModel.update({ showId: id });
+      this.maybeRequest();
     }
   }
 
-  hydrate(id: string) {
-    fetch("/data/shows.json")
-      .then((r) => r.json())
-      .then((data: { shows: Show[] }) => {
-        const show = data.shows.find((s) => s.id === id);
-        if (!show) {
-          shadow(this).replace(html`
-            <article>
-              <p>Show not found.</p>
-              <p><a href="/app">← Back to all shows</a></p>
-            </article>
-          `);
-          return;
-        }
-        shadow(this).replace(html`
-          <article>
-            <h1>${show.title}</h1>
-            <p><time datetime=${show.datetime}>${show.date}</time></p>
-            <p>${show.venue}</p>
-            <p><a href="/app">← Back to all shows</a></p>
-          </article>
-        `);
-      })
-      .catch((err) => {
-        shadow(this).replace(
-          html`<p>Error loading show: ${err.message}</p>`
-        );
-      });
+  connectedCallback() {
+    this.maybeRequest();
+  }
+
+  private maybeRequest() {
+    if (!this.isConnected) return;
+    const { showId, show } = this.viewModel.toObject() as ShowVM;
+    if (!showId) return;
+    if (show && show.id === showId) return;
+    Store.dispatch(this, ["show/request", { id: showId }]);
   }
 }
