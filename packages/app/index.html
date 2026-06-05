@@ -4,16 +4,104 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Concerto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/reset.css">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/page.css">
+  <link rel="stylesheet" href="/styles/layout.css">
+  <style>
+    /* unbndl providers wrap content but shouldn't break body layout.
+       layout.css makes body a 2-row grid that assumes <header> and
+       <main> are direct children of <body>; in the SPA they're nested
+       inside <history-provider> / <auth-provider> / <store-provider>.
+       Override body back to normal block flow so the header sizes to
+       its own content. */
+    body {
+      display: block;
+      min-height: 100vh;
+      background-color: var(--color-background-page);
+    }
+    history-provider,
+    auth-provider,
+    store-provider {
+      display: contents;
+    }
+    .site-header {
+      padding: var(--space-2) var(--space-5);
+      align-items: center;
+    }
+    .site-brand {
+      gap: 0;
+    }
+    .site-name {
+      font-size: 1.5rem;
+    }
+    .site-tagline {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+    .site-header-meta {
+      align-items: end;
+      justify-items: end;
+    }
+    @media (max-width: 900px) {
+      .site-header {
+        padding: var(--space-2) var(--space-4);
+        gap: var(--space-1);
+      }
+    }
+  </style>
 </head>
 <body>
   <history-provider>
     <auth-provider redirect="/login.html">
       <store-provider>
-        <header style="padding: 0.75rem 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: baseline;">
-          <a href="/app" style="font-weight: 600; text-decoration: none; color: inherit;">Concerto</a>
-          <concerto-auth-status></concerto-auth-status>
+        <header class="site-header">
+          <div class="site-brand">
+            <a class="site-name" href="/app">Concerto</a>
+            <p class="site-tagline">Concert memory tracker</p>
+          </div>
+          <div class="site-header-meta">
+            <concerto-auth-status></concerto-auth-status>
+          </div>
         </header>
-        <router-switch></router-switch>
+        <main class="page-grid">
+          <section class="page-main">
+            <router-switch></router-switch>
+          </section>
+          <aside class="page-side">
+            <section class="card">
+              <h2>Artists</h2>
+              <ul class="stack-list">
+                <li><a href="/artists/aespa.html" onclick="event.stopPropagation()">aespa</a></li>
+                <li><a href="/artists/grent-perez.html" onclick="event.stopPropagation()">Grent Perez</a></li>
+              </ul>
+            </section>
+            <section class="card">
+              <h2>Venues</h2>
+              <ul class="stack-list">
+                <li><a href="/venues/kia-forum.html" onclick="event.stopPropagation()">Kia Forum</a></li>
+                <li><a href="/venues/fonda-theater.html" onclick="event.stopPropagation()">Fonda Theater</a></li>
+              </ul>
+            </section>
+            <section class="card">
+              <h2>Setlists</h2>
+              <ul class="stack-list">
+                <li><a href="/setlists/aespa-kia-forum-2025-setlist.html" onclick="event.stopPropagation()">aespa @ Kia Forum</a></li>
+                <li><a href="/setlists/grent-perez-fonda-2023-setlist.html" onclick="event.stopPropagation()">Grent Perez @ Fonda</a></li>
+              </ul>
+            </section>
+            <section class="card">
+              <h2>Memories</h2>
+              <ul class="stack-list">
+                <li><a href="/memories/aespa-kia-forum-2025-memory.html" onclick="event.stopPropagation()">aespa @ Kia Forum</a></li>
+                <li><a href="/memories/grent-perez-fonda-2023-memory.html" onclick="event.stopPropagation()">Grent Perez @ Fonda</a></li>
+              </ul>
+            </section>
+          </aside>
+        </main>
       </store-provider>
     </auth-provider>
   </history-provider>

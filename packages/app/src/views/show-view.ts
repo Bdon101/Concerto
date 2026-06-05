@@ -1,4 +1,4 @@
-import { html, shadow } from "@unbndl/html";
+import { css, html, shadow } from "@unbndl/html";
 import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { Show } from "server/models";
@@ -25,6 +25,7 @@ export class ShowViewElement extends HTMLElement {
           <h1>${$.show.title}</h1>
           <p><time datetime=${$.show.datetime}>${$.show.date}</time></p>
           <p>${$.show.venue}</p>
+          <p><a href=${`/app/shows/${$.show.id}/edit`}>Edit</a></p>
         `;
       }}
       <p><a href="/app">← Back to all shows</a></p>
@@ -33,8 +34,45 @@ export class ShowViewElement extends HTMLElement {
 
   constructor() {
     super();
-    shadow(this).replace(this.viewModel.render(this.view));
+    shadow(this)
+      .styles(ShowViewElement.styles)
+      .replace(this.viewModel.render(this.view));
   }
+
+  static styles = css`
+    :host {
+      display: block;
+      padding: var(--space-4);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+    }
+    article {
+      display: grid;
+      gap: var(--space-2);
+    }
+    h1 {
+      color: var(--color-heading);
+      font-family: var(--font-family-display);
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    p {
+      margin: 0;
+    }
+    time {
+      font-family: var(--font-family-display);
+      font-size: 1.1rem;
+      color: var(--color-link);
+    }
+    a {
+      color: var(--color-link);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  `;
 
   attributeChangedCallback(
     name: string,

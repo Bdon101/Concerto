@@ -7,9 +7,14 @@ import { Msg } from "./messages.ts";
 import update, { Cmd } from "./update.ts";
 import { HomeViewElement } from "./views/home-view.ts";
 import { ShowViewElement } from "./views/show-view.ts";
+import { ShowEditViewElement } from "./views/show-edit-view.ts";
 import { AuthStatusElement } from "./components/auth-status.ts";
 
 const routes = [
+  {
+    path: "/app/shows/:id/edit",
+    view: html`<show-edit-view show-id=${($: any) => $.params.id}></show-edit-view>`
+  },
   {
     path: "/app/shows/:id",
     view: html`<show-view show-id=${($: any) => $.params.id}></show-view>`
@@ -42,5 +47,6 @@ define({
   },
   "home-view": HomeViewElement,
   "show-view": ShowViewElement,
+  "show-edit-view": ShowEditViewElement,
   "concerto-auth-status": AuthStatusElement
 });
