@@ -5,4 +5,7 @@ export interface Show {
   datetime: string;
   venue: string;
   href: string;
+  artistName?: string;
+  songs?: string[];
+  memoryText?: string;
 }
