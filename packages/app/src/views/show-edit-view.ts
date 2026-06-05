@@ -130,39 +130,61 @@ export class ShowEditViewElement extends HTMLElement {
   static styles = css`
     :host {
       display: block;
+      padding: var(--space-4);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
     }
     .edit {
-      max-width: 480px;
-      padding: 1.5rem;
+      display: grid;
+      gap: var(--space-3);
+    }
+    h1 {
+      color: var(--color-heading);
+      font-family: var(--font-family-display);
+      font-size: 1.6rem;
+      font-weight: 600;
     }
     form {
       display: grid;
-      gap: 1rem;
+      gap: var(--space-3);
     }
     label {
       display: grid;
-      gap: 0.25rem;
+      gap: var(--space-1);
     }
     input {
-      padding: 0.4rem;
+      padding: var(--space-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      background: var(--color-background-page);
+      color: var(--color-text);
       font: inherit;
     }
     .actions {
       display: flex;
-      gap: 1rem;
+      gap: var(--space-3);
       align-items: center;
     }
     button {
-      padding: 0.5rem 1rem;
-      border: 1px solid #999;
-      background: #fff;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border);
+      background: var(--color-background-header);
+      color: var(--color-text-inverted);
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: var(--radius-card);
       font: inherit;
     }
     button[disabled] {
       opacity: 0.5;
       cursor: progress;
+    }
+    a {
+      color: var(--color-link);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
     }
     .error {
       color: #b00020;

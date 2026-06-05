@@ -64,20 +64,22 @@ export class LoginFormElement extends HTMLElement {
   static styles = css`
     form {
       display: grid;
-      gap: 1rem;
+      gap: var(--space-3);
       max-width: 360px;
     }
     ::slotted(label) {
       display: grid;
-      gap: 0.25rem;
+      gap: var(--space-1);
     }
     button {
       justify-self: start;
-      padding: 0.5rem 1rem;
-      border: 1px solid #ccc;
-      background: #fff;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border);
+      background: var(--color-background-header);
+      color: var(--color-text-inverted);
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: var(--radius-card);
+      font: inherit;
     }
     .error {
       color: #b00020;

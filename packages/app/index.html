@@ -4,16 +4,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Concerto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/reset.css">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/page.css">
+  <link rel="stylesheet" href="/styles/layout.css">
+  <style>
+    /* unbndl providers wrap content but shouldn't break the body grid */
+    history-provider,
+    auth-provider,
+    store-provider {
+      display: contents;
+    }
+    .site-header-meta {
+      align-items: end;
+      justify-items: end;
+    }
+  </style>
 </head>
 <body>
   <history-provider>
     <auth-provider redirect="/login.html">
       <store-provider>
-        <header style="padding: 0.75rem 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: baseline;">
-          <a href="/app" style="font-weight: 600; text-decoration: none; color: inherit;">Concerto</a>
-          <concerto-auth-status></concerto-auth-status>
+        <header class="site-header">
+          <div class="site-brand">
+            <a class="site-name" href="/app">Concerto</a>
+            <p class="site-tagline">Concert memory tracker</p>
+          </div>
+          <div class="site-header-meta">
+            <concerto-auth-status></concerto-auth-status>
+          </div>
         </header>
-        <router-switch></router-switch>
+        <main class="page-grid">
+          <section class="page-main">
+            <router-switch></router-switch>
+          </section>
+        </main>
       </store-provider>
     </auth-provider>
   </history-provider>

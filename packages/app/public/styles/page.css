@@ -1,0 +1,88 @@
+body {
+  background-color: var(--color-background-page);
+  color: var(--color-text);
+  font-family: var(--font-family-body);
+  font-size: 1rem;
+  font-weight: 400;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1 {
+  color: var(--color-heading);
+  font-family: var(--font-family-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+h2 {
+  color: var(--color-link);
+  font-family: var(--font-family-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+a {
+  color: var(--color-link);
+}
+
+.site-name,
+.site-nav a {
+  color: var(--color-text-inverted);
+  text-decoration: none;
+}
+
+.site-name {
+  font-family: var(--font-family-display);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.site-tagline,
+.page-tag {
+  color: var(--color-text-inverted);
+}
+
+.site-tagline {
+  font-size: 0.95rem;
+}
+
+.page-tag {
+  font-family: var(--font-family-display);
+  font-size: 1.1rem;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-inverted);
+  cursor: pointer;
+}
+
+.mode-toggle input {
+  accent-color: var(--color-accent);
+}
+
+.detail-label,
+.meta-label {
+  font-weight: 700;
+}
+
+.meta-line {
+  font-size: 0.95rem;
+}
+
+.memory-text {
+  font-style: italic;
+}
+
+svg.icon {
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: text-bottom;
+  fill: currentColor;
+  margin-right: 0.35rem;
+}

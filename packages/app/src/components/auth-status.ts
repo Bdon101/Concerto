@@ -31,6 +31,7 @@ export class AuthStatusElement extends HTMLElement {
     :host {
       display: inline-block;
       font-size: 0.95rem;
+      color: var(--color-text-inverted);
     }
     .when-signed-in,
     .when-signed-out {
@@ -42,6 +43,10 @@ export class AuthStatusElement extends HTMLElement {
     .logged-out .when-signed-out {
       display: inline;
     }
+    a {
+      color: var(--color-text-inverted);
+      text-decoration: underline;
+    }
     button {
       background: transparent;
       border: none;
@@ -49,7 +54,7 @@ export class AuthStatusElement extends HTMLElement {
       font: inherit;
       text-decoration: underline;
       padding: 0;
-      color: inherit;
+      color: var(--color-text-inverted);
     }
   `;
 
