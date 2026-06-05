@@ -25,13 +25,15 @@ export class ShowViewElement extends HTMLElement {
           <h1>${$.show.title}</h1>
           <p><time datetime=${$.show.datetime}>${$.show.date}</time></p>
           <p>${$.show.venue}</p>
-          <p>
-            <a href=${`/app/shows/${$.show.id}/edit`}>Edit</a>${$.show.songs?.length
-              ? html` · <a href=${`/app/shows/${$.show.id}/setlist`}>Setlist</a>`
-              : html``}${$.show.memoryText
-              ? html` · <a href=${`/app/shows/${$.show.id}/memory`}>Memory</a>`
+          <nav class="show-links">
+            <a href=${`/app/shows/${$.show.id}/edit`}>Edit</a>
+            ${$.show.songs?.length
+              ? html`<a href=${`/app/shows/${$.show.id}/setlist`}>Setlist</a>`
               : html``}
-          </p>
+            ${$.show.memoryText
+              ? html`<a href=${`/app/shows/${$.show.id}/memory`}>Memory</a>`
+              : html``}
+          </nav>
         `;
       }}
       <p><a href="/app">← Back to all shows</a></p>
@@ -77,6 +79,17 @@ export class ShowViewElement extends HTMLElement {
     }
     a:hover {
       text-decoration: underline;
+    }
+    .show-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-1);
+    }
+    .show-links a + a::before {
+      content: "·";
+      margin-right: var(--space-3);
+      color: var(--color-border);
     }
   `;
 
