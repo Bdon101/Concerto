@@ -1,11 +1,13 @@
 import { define, html } from "@unbndl/html";
 import { BrowserHistory, Switch } from "@unbndl/switch";
 import { Store } from "@unbndl/store";
+import { Auth } from "@unbndl/auth";
 import { Model, init } from "./model.ts";
 import { Msg } from "./messages.ts";
 import update, { Cmd } from "./update.ts";
 import { HomeViewElement } from "./views/home-view.ts";
 import { ShowViewElement } from "./views/show-view.ts";
+import { AuthStatusElement } from "./components/auth-status.ts";
 
 const routes = [
   {
@@ -24,6 +26,7 @@ const routes = [
 
 define({
   "history-provider": BrowserHistory.Provider,
+  "auth-provider": Auth.Provider,
   "store-provider": class AppStore extends Store.Provider<Model, Msg, Cmd> {
     constructor() {
       super(update, init);
@@ -38,5 +41,6 @@ define({
     }
   },
   "home-view": HomeViewElement,
-  "show-view": ShowViewElement
+  "show-view": ShowViewElement,
+  "concerto-auth-status": AuthStatusElement
 });

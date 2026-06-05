@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in — Concerto</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 480px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { margin-top: 0; }
+    label { display: grid; gap: 0.25rem; }
+    input { padding: 0.4rem; }
+  </style>
+</head>
+<body>
+  <auth-provider>
+    <main>
+      <h1>Sign in</h1>
+      <login-form api="/auth/login">
+        <label>
+          <span>Username</span>
+          <input name="username" autocomplete="username" />
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" autocomplete="current-password" />
+        </label>
+      </login-form>
+      <p>Need an account? <a href="/register.html">Register</a></p>
+    </main>
+  </auth-provider>
+  <script type="module" src="/src/login.ts"></script>
+</body>
+</html>

@@ -7,9 +7,15 @@
 </head>
 <body>
   <history-provider>
-    <store-provider>
-      <router-switch></router-switch>
-    </store-provider>
+    <auth-provider redirect="/login.html">
+      <store-provider>
+        <header style="padding: 0.75rem 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: baseline;">
+          <a href="/app" style="font-weight: 600; text-decoration: none; color: inherit;">Concerto</a>
+          <concerto-auth-status></concerto-auth-status>
+        </header>
+        <router-switch></router-switch>
+      </store-provider>
+    </auth-provider>
   </history-provider>
   <script type="module" src="/src/main.ts"></script>
 </body>
