@@ -25,7 +25,13 @@ export class ShowViewElement extends HTMLElement {
           <h1>${$.show.title}</h1>
           <p><time datetime=${$.show.datetime}>${$.show.date}</time></p>
           <p>${$.show.venue}</p>
-          <p><a href=${`/app/shows/${$.show.id}/edit`}>Edit</a></p>
+          <p>
+            <a href=${`/app/shows/${$.show.id}/edit`}>Edit</a>${$.show.songs?.length
+              ? html` · <a href=${`/app/shows/${$.show.id}/setlist`}>Setlist</a>`
+              : html``}${$.show.memoryText
+              ? html` · <a href=${`/app/shows/${$.show.id}/memory`}>Memory</a>`
+              : html``}
+          </p>
         `;
       }}
       <p><a href="/app">← Back to all shows</a></p>
