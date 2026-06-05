@@ -18,9 +18,28 @@
     store-provider {
       display: contents;
     }
+    .site-header {
+      padding: var(--space-2) var(--space-5);
+    }
+    .site-brand {
+      gap: 0;
+    }
+    .site-name {
+      font-size: 1.5rem;
+    }
+    .site-tagline {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
     .site-header-meta {
       align-items: end;
       justify-items: end;
+    }
+    @media (max-width: 900px) {
+      .site-header {
+        padding: var(--space-2) var(--space-4);
+        gap: var(--space-1);
+      }
     }
   </style>
 </head>
