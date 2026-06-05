@@ -1,4 +1,4 @@
-import { Show } from "server/models";
+import { Show, Artist, Venue } from "server/models";
 
 export interface SaveCallbacks {
   onSuccess?: () => void;
@@ -11,4 +11,12 @@ export type Msg =
   | ["show/request", { id: string }]
   | ["show/loaded", { show: Show }]
   | ["show/save", { id: string; show: Show }, SaveCallbacks]
+  | ["artists/request"]
+  | ["artists/loaded", { artists: Artist[] }]
+  | ["artist/request", { id: string }]
+  | ["artist/loaded", { artist: Artist }]
+  | ["venues/request"]
+  | ["venues/loaded", { venues: Venue[] }]
+  | ["venue/request", { id: string }]
+  | ["venue/loaded", { venue: Venue }]
   | ["noop"];

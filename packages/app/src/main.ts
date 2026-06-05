@@ -8,6 +8,10 @@ import update, { Cmd } from "./update.ts";
 import { HomeViewElement } from "./views/home-view.ts";
 import { ShowViewElement } from "./views/show-view.ts";
 import { ShowEditViewElement } from "./views/show-edit-view.ts";
+import { ArtistViewElement } from "./views/artist-view.ts";
+import { VenueViewElement } from "./views/venue-view.ts";
+import { SetlistViewElement } from "./views/setlist-view.ts";
+import { MemoryViewElement } from "./views/memory-view.ts";
 import { AuthStatusElement } from "./components/auth-status.ts";
 
 const routes = [
@@ -16,8 +20,24 @@ const routes = [
     view: html`<show-edit-view show-id=${($: any) => $.params.id}></show-edit-view>`
   },
   {
+    path: "/app/shows/:id/setlist",
+    view: html`<setlist-view show-id=${($: any) => $.params.id}></setlist-view>`
+  },
+  {
+    path: "/app/shows/:id/memory",
+    view: html`<memory-view show-id=${($: any) => $.params.id}></memory-view>`
+  },
+  {
     path: "/app/shows/:id",
     view: html`<show-view show-id=${($: any) => $.params.id}></show-view>`
+  },
+  {
+    path: "/app/artists/:id",
+    view: html`<artist-view artist-id=${($: any) => $.params.id}></artist-view>`
+  },
+  {
+    path: "/app/venues/:id",
+    view: html`<venue-view venue-id=${($: any) => $.params.id}></venue-view>`
   },
   {
     path: "/app",
@@ -48,5 +68,9 @@ define({
   "home-view": HomeViewElement,
   "show-view": ShowViewElement,
   "show-edit-view": ShowEditViewElement,
+  "artist-view": ArtistViewElement,
+  "venue-view": VenueViewElement,
+  "setlist-view": SetlistViewElement,
+  "memory-view": MemoryViewElement,
   "concerto-auth-status": AuthStatusElement
 });

@@ -8,7 +8,10 @@ const showSchema = new Schema<Show>(
     date: String,
     datetime: String,
     venue: String,
-    href: String
+    href: String,
+    artistName: String,
+    songs: [String],
+    memoryText: String
   },
   { collection: "concerto_shows" }
 );

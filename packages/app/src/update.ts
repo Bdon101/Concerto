@@ -1,4 +1,4 @@
-import { Show } from "server/models";
+import { Show, Artist, Venue } from "server/models";
 import { Auth } from "@unbndl/auth";
 import { Model } from "./model.ts";
 import { Msg, SaveCallbacks } from "./messages.ts";
@@ -30,6 +30,32 @@ export default function update(
     }
     case "show/save":
       return [model, saveShow(message[1], message[2], user)];
+    case "artists/request":
+      return [model, requestArtists(user)];
+    case "artists/loaded":
+      return { ...model, artists: message[1].artists };
+    case "artist/request":
+      return [model, requestArtist(message[1].id, user)];
+    case "artist/loaded": {
+      const updated = message[1].artist;
+      const artists = model.artists
+        ? model.artists.map((a) => (a.id === updated.id ? updated : a))
+        : model.artists;
+      return { ...model, artist: updated, artists };
+    }
+    case "venues/request":
+      return [model, requestVenues(user)];
+    case "venues/loaded":
+      return { ...model, venues: message[1].venues };
+    case "venue/request":
+      return [model, requestVenue(message[1].id, user)];
+    case "venue/loaded": {
+      const updated = message[1].venue;
+      const venues = model.venues
+        ? model.venues.map((v) => (v.id === updated.id ? updated : v))
+        : model.venues;
+      return { ...model, venue: updated, venues };
+    }
     case "noop":
       return model;
     default: {
@@ -58,6 +84,50 @@ function requestShow(id: string, user: Auth.Model): Promise<Msg> {
       return res.json();
     })
     .then((show: Show): Msg => ["show/loaded", { show }])
+    .catch((): Msg => ["noop"]);
+}
+
+function requestArtists(user: Auth.Model): Promise<Msg> {
+  return fetch("/api/artists", { headers: Auth.headers(user) })
+    .then((res) => {
+      if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((artists: Artist[]): Msg => ["artists/loaded", { artists }])
+    .catch((): Msg => ["noop"]);
+}
+
+function requestArtist(id: string, user: Auth.Model): Promise<Msg> {
+  return fetch(`/api/artists/${encodeURIComponent(id)}`, {
+    headers: Auth.headers(user)
+  })
+    .then((res) => {
+      if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((artist: Artist): Msg => ["artist/loaded", { artist }])
+    .catch((): Msg => ["noop"]);
+}
+
+function requestVenues(user: Auth.Model): Promise<Msg> {
+  return fetch("/api/venues", { headers: Auth.headers(user) })
+    .then((res) => {
+      if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((venues: Venue[]): Msg => ["venues/loaded", { venues }])
+    .catch((): Msg => ["noop"]);
+}
+
+function requestVenue(id: string, user: Auth.Model): Promise<Msg> {
+  return fetch(`/api/venues/${encodeURIComponent(id)}`, {
+    headers: Auth.headers(user)
+  })
+    .then((res) => {
+      if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((venue: Venue): Msg => ["venue/loaded", { venue }])
     .catch((): Msg => ["noop"]);
 }
 
