@@ -16,13 +16,18 @@ export default function update(
 ): UpdateResult {
   switch (message[0]) {
     case "shows/request":
-      return [model, requestShows()];
+      return [model, requestShows(user)];
     case "shows/loaded":
       return { ...model, shows: message[1].shows };
     case "show/request":
-      return [model, requestShow(message[1].id)];
-    case "show/loaded":
-      return { ...model, show: message[1].show };
+      return [model, requestShow(message[1].id, user)];
+    case "show/loaded": {
+      const updated = message[1].show;
+      const shows = model.shows
+        ? model.shows.map((s) => (s.id === updated.id ? updated : s))
+        : model.shows;
+      return { ...model, show: updated, shows };
+    }
     case "show/save":
       return [model, saveShow(message[1], message[2], user)];
     case "noop":
@@ -34,25 +39,26 @@ export default function update(
   }
 }
 
-function fetchAllShows(): Promise<Show[]> {
-  return fetch("/data/shows.json")
+function requestShows(user: Auth.Model): Promise<Msg> {
+  return fetch("/api/shows", { headers: Auth.headers(user) })
     .then((res) => {
-      if (res.status !== 200) throw `HTTP ${res.status}`;
+      if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
-    .then((json: { shows: Show[] }) => json.shows);
+    .then((shows: Show[]): Msg => ["shows/loaded", { shows }])
+    .catch((): Msg => ["noop"]);
 }
 
-function requestShows(): Promise<Msg> {
-  return fetchAllShows().then((shows) => ["shows/loaded", { shows }]);
-}
-
-function requestShow(id: string): Promise<Msg> {
-  return fetchAllShows().then((shows) => {
-    const show = shows.find((s) => s.id === id);
-    if (!show) throw `Show "${id}" not found`;
-    return ["show/loaded", { show }];
-  });
+function requestShow(id: string, user: Auth.Model): Promise<Msg> {
+  return fetch(`/api/shows/${encodeURIComponent(id)}`, {
+    headers: Auth.headers(user)
+  })
+    .then((res) => {
+      if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((show: Show): Msg => ["show/loaded", { show }])
+    .catch((): Msg => ["noop"]);
 }
 
 function saveShow(

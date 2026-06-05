@@ -41,7 +41,10 @@ export class HomeViewElement extends HTMLElement {
   }
 
   connectedCallback() {
-    Store.dispatch(this, ["shows/request"]);
+    // Defer past the current sync block so the store-provider's
+    // fromAuth observer has time to populate the Bearer token in the
+    // store's viewModel before the reducer reads `user`.
+    setTimeout(() => Store.dispatch(this, ["shows/request"]), 0);
   }
 
   static styles = css`
