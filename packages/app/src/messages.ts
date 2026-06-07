@@ -11,6 +11,8 @@ export type Msg =
   | ["show/request", { id: string }]
   | ["show/loaded", { show: Show }]
   | ["show/save", { id: string; show: Show }, SaveCallbacks]
+  | ["show/create", { show: Show }, SaveCallbacks]
+  | ["show/created", { show: Show }]
   | ["artists/request"]
   | ["artists/loaded", { artists: Artist[] }]
   | ["artist/request", { id: string }]

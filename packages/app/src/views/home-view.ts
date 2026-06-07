@@ -15,6 +15,7 @@ export class HomeViewElement extends HTMLElement {
   view = html`
     <section>
       <h1>Concerts</h1>
+      <p class="actions"><a href="/app/shows/new">+ Add a show</a></p>
       <ul>
         ${($: HomeVM) =>
           $.shows
@@ -88,6 +89,9 @@ export class HomeViewElement extends HTMLElement {
     }
     time {
       font-family: var(--font-family-display);
+    }
+    .actions {
+      font-size: 0.95rem;
     }
   `;
 }

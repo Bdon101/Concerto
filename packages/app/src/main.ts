@@ -8,6 +8,7 @@ import update, { Cmd } from "./update.ts";
 import { HomeViewElement } from "./views/home-view.ts";
 import { ShowViewElement } from "./views/show-view.ts";
 import { ShowEditViewElement } from "./views/show-edit-view.ts";
+import { ShowNewViewElement } from "./views/show-new-view.ts";
 import { ArtistViewElement } from "./views/artist-view.ts";
 import { VenueViewElement } from "./views/venue-view.ts";
 import { SetlistViewElement } from "./views/setlist-view.ts";
@@ -15,6 +16,12 @@ import { MemoryViewElement } from "./views/memory-view.ts";
 import { AuthStatusElement } from "./components/auth-status.ts";
 
 const routes = [
+  {
+    // Literal "new" must come before /app/shows/:id, otherwise route-parser
+    // matches it as :id="new" and the form is unreachable.
+    path: "/app/shows/new",
+    view: html`<show-new-view></show-new-view>`
+  },
   {
     path: "/app/shows/:id/edit",
     view: html`<show-edit-view show-id=${($: any) => $.params.id}></show-edit-view>`
@@ -68,6 +75,7 @@ define({
   "home-view": HomeViewElement,
   "show-view": ShowViewElement,
   "show-edit-view": ShowEditViewElement,
+  "show-new-view": ShowNewViewElement,
   "artist-view": ArtistViewElement,
   "venue-view": VenueViewElement,
   "setlist-view": SetlistViewElement,

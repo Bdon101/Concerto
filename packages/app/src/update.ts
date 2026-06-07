@@ -30,6 +30,16 @@ export default function update(
     }
     case "show/save":
       return [model, saveShow(message[1], message[2], user)];
+    case "show/create":
+      return [model, createShow(message[1], message[2], user)];
+    case "show/created": {
+      const created = message[1].show;
+      return {
+        ...model,
+        show: created,
+        shows: model.shows ? [...model.shows, created] : [created]
+      };
+    }
     case "artists/request":
       return [model, requestArtists(user)];
     case "artists/loaded":
@@ -153,6 +163,35 @@ function saveShow(
     .then((updated: Show): Msg => {
       callbacks.onSuccess?.();
       return ["show/loaded", { show: updated }];
+    })
+    .catch((err: Error): Msg => {
+      callbacks.onFailure?.(err);
+      return ["noop"];
+    });
+}
+
+function createShow(
+  payload: { show: Show },
+  callbacks: SaveCallbacks,
+  user: Auth.Model
+): Promise<Msg> {
+  return fetch(`/api/shows`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...Auth.headers(user)
+    },
+    body: JSON.stringify(payload.show)
+  })
+    .then((res) => {
+      if (res.status !== 201) {
+        throw new Error(`Create failed (HTTP ${res.status})`);
+      }
+      return res.json();
+    })
+    .then((created: Show): Msg => {
+      callbacks.onSuccess?.();
+      return ["show/created", { show: created }];
     })
     .catch((err: Error): Msg => {
       callbacks.onFailure?.(err);
