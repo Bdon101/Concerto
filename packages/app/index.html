@@ -38,18 +38,22 @@
     .site-name {
       font-size: 1.5rem;
     }
-    .site-tagline {
-      font-size: 0.85rem;
-      opacity: 0.85;
-    }
     .site-header-meta {
       align-items: end;
       justify-items: end;
+    }
+    .page-content {
+      max-width: var(--page-max-width);
+      margin: 0 auto;
+      padding: var(--space-5) var(--space-4);
     }
     @media (max-width: 900px) {
       .site-header {
         padding: var(--space-2) var(--space-4);
         gap: var(--space-1);
+      }
+      .page-content {
+        padding: var(--space-4) var(--space-3);
       }
     }
   </style>
@@ -61,46 +65,15 @@
         <header class="site-header">
           <div class="site-brand">
             <a class="site-name" href="/app">Concerto</a>
-            <p class="site-tagline">Concert memory tracker</p>
           </div>
           <div class="site-header-meta">
             <concerto-auth-status></concerto-auth-status>
           </div>
         </header>
-        <main class="page-grid">
-          <section class="page-main">
+        <main>
+          <div class="page-content">
             <router-switch></router-switch>
-          </section>
-          <aside class="page-side">
-            <section class="card">
-              <h2>Artists</h2>
-              <ul class="stack-list">
-                <li><a href="/app/artists/aespa">aespa</a></li>
-                <li><a href="/app/artists/grent-perez">Grent Perez</a></li>
-              </ul>
-            </section>
-            <section class="card">
-              <h2>Venues</h2>
-              <ul class="stack-list">
-                <li><a href="/app/venues/kia-forum">Kia Forum</a></li>
-                <li><a href="/app/venues/fonda-theater">Fonda Theater</a></li>
-              </ul>
-            </section>
-            <section class="card">
-              <h2>Setlists</h2>
-              <ul class="stack-list">
-                <li><a href="/app/shows/aespa-kia-forum-2025/setlist">aespa @ Kia Forum</a></li>
-                <li><a href="/app/shows/grent-perez-fonda-2023/setlist">Grent Perez @ Fonda</a></li>
-              </ul>
-            </section>
-            <section class="card">
-              <h2>Memories</h2>
-              <ul class="stack-list">
-                <li><a href="/app/shows/aespa-kia-forum-2025/memory">aespa @ Kia Forum</a></li>
-                <li><a href="/app/shows/grent-perez-fonda-2023/memory">Grent Perez @ Fonda</a></li>
-              </ul>
-            </section>
-          </aside>
+          </div>
         </main>
       </store-provider>
     </auth-provider>
