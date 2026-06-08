@@ -1,5 +1,5 @@
 import { css, html, shadow } from "@unbndl/html";
-import rawStyles from "./login-form.css?inline";
+import rawStyles from "./styles/login-form.css?inline";
 
 export class LoginFormElement extends HTMLElement {
   constructor() {

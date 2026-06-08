@@ -4,7 +4,7 @@ import { Store, fromStore } from "@unbndl/store";
 import { Show } from "server/models";
 import { Model } from "../model.ts";
 import { uploadImage } from "../lib/images.ts";
-import rawStyles from "./show-edit-view.css?inline";
+import rawStyles from "./styles/show-edit-view.css?inline";
 
 const DEFAULT_RATING = 5;
 

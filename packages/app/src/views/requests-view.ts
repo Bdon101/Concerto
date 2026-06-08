@@ -3,7 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { ShareRequest } from "server/models";
 import { Model } from "../model.ts";
-import rawStyles from "./requests-view.css?inline";
+import rawStyles from "./styles/requests-view.css?inline";
 
 interface RequestsVM {
   incomingRequests?: ShareRequest[];

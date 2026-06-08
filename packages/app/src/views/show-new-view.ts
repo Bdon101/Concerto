@@ -3,7 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store } from "@unbndl/store";
 import { Show } from "server/models";
 import { uploadImage } from "../lib/images.ts";
-import rawStyles from "./show-new-view.css?inline";
+import rawStyles from "./styles/show-new-view.css?inline";
 
 const DEFAULT_RATING = 5;
 

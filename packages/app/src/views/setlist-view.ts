@@ -3,7 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { Show } from "server/models";
 import { Model } from "../model.ts";
-import rawStyles from "./setlist-view.css?inline";
+import rawStyles from "./styles/setlist-view.css?inline";
 
 interface SetlistVM {
   show?: Show;

@@ -3,7 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { Venue, Show } from "server/models";
 import { Model } from "../model.ts";
-import rawStyles from "./venue-view.css?inline";
+import rawStyles from "./styles/venue-view.css?inline";
 
 interface VenueVM {
   venue?: Venue;

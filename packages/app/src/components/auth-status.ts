@@ -4,7 +4,7 @@ import { fromAuth } from "@unbndl/auth";
 import { Store, fromStore } from "@unbndl/store";
 import { ShareRequest } from "server/models";
 import { Model } from "../model.ts";
-import rawStyles from "./auth-status.css?inline";
+import rawStyles from "./styles/auth-status.css?inline";
 
 interface AuthVM {
   authenticated: boolean;

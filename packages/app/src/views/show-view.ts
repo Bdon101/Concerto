@@ -4,7 +4,7 @@ import { Store, fromStore } from "@unbndl/store";
 import { fromAuth } from "@unbndl/auth";
 import { Show } from "server/models";
 import { Model } from "../model.ts";
-import rawStyles from "./show-view.css?inline";
+import rawStyles from "./styles/show-view.css?inline";
 
 interface ShowVM {
   show?: Show;

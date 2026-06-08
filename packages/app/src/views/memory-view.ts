@@ -3,7 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { Show } from "server/models";
 import { Model } from "../model.ts";
-import rawStyles from "./memory-view.css?inline";
+import rawStyles from "./styles/memory-view.css?inline";
 
 interface MemoryVM {
   show?: Show;

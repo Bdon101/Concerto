@@ -3,7 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { Artist, Show } from "server/models";
 import { Model } from "../model.ts";
-import rawStyles from "./artist-view.css?inline";
+import rawStyles from "./styles/artist-view.css?inline";
 
 interface ArtistVM {
   artist?: Artist;
