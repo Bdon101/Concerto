@@ -35,9 +35,7 @@ export class ShowViewElement extends HTMLElement {
         <a class="back-link" href="/app">← All concerts</a>
 
         ${s.coverImage
-          ? html`<div class="hero-wrap">
-              <img class="hero-polaroid" src=${s.coverImage} alt="" />
-            </div>`
+          ? html`<img class="hero" src=${s.coverImage} alt="" />`
           : html``}
 
         <div class="title-block">
@@ -161,21 +159,13 @@ export class ShowViewElement extends HTMLElement {
     }
 
     /* ── Hero placeholder ── */
-    .hero-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: var(--space-5);
-    }
-    .hero-polaroid {
-      width: 440px;
-      max-width: 100%;
-      height: 330px;
+    .hero {
+      width: 100%;
+      aspect-ratio: 5 / 2;
       object-fit: cover;
-      background: #fff;
-      border: 14px solid #fff;
-      border-bottom-width: 48px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
-      transform: rotate(-1.5deg);
+      display: block;
+      border-radius: var(--radius-card);
+      margin-bottom: var(--space-5);
     }
 
     /* ── Title block ── */
