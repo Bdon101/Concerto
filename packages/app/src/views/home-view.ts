@@ -152,7 +152,7 @@ export class HomeViewElement extends HTMLElement {
     }
     h1 {
       font-family: var(--font-family-display);
-      font-size: 2.25rem;
+      font-size: 2.75rem;
       font-weight: 600;
       color: var(--color-heading);
       margin: 0;
@@ -175,7 +175,7 @@ export class HomeViewElement extends HTMLElement {
       padding: 0 0 2px;
       cursor: pointer;
       font-family: var(--font-family-body);
-      font-size: 0.875rem;
+      font-size: 1rem;
       color: var(--color-border);
     }
     .sort-btn.active {
@@ -189,7 +189,7 @@ export class HomeViewElement extends HTMLElement {
     /* ── Add link ── */
     .add-link {
       font-family: var(--font-family-body);
-      font-size: 0.875rem;
+      font-size: 1rem;
       color: var(--color-link);
       text-decoration: none;
     }
@@ -204,9 +204,9 @@ export class HomeViewElement extends HTMLElement {
     }
     .feed-row {
       display: flex;
-      gap: var(--space-4);
+      gap: var(--space-5);
       align-items: flex-start;
-      padding: var(--space-4) 0;
+      padding: var(--space-5) 0;
       border-bottom: 1px solid rgba(143, 123, 61, 0.3);
     }
     .feed-row:last-child {
@@ -220,13 +220,13 @@ export class HomeViewElement extends HTMLElement {
     }
     .thumb-polaroid {
       display: block;
-      width: 160px;
-      height: 120px;
+      width: 220px;
+      height: 165px;
       object-fit: cover;
       background: #fff;
-      border: 7px solid #fff;
-      border-bottom-width: 24px;
-      box-shadow: 0 2px 9px rgba(0, 0, 0, 0.22);
+      border: 9px solid #fff;
+      border-bottom-width: 32px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.24);
       transform: rotate(-2deg);
     }
     .thumb-polaroid.placeholder {
@@ -246,10 +246,10 @@ export class HomeViewElement extends HTMLElement {
     }
     .show-title {
       font-family: var(--font-family-display);
-      font-size: 1.5rem;
+      font-size: 2rem;
       font-weight: 600;
       margin: 0;
-      line-height: 1.2;
+      line-height: 1.15;
     }
     .show-title a {
       color: var(--color-text);
@@ -261,16 +261,16 @@ export class HomeViewElement extends HTMLElement {
     .meta {
       font-family: var(--font-family-body);
       font-style: italic;
-      font-size: 0.8125rem;
+      font-size: 1rem;
       color: var(--color-border);
       margin: 0;
     }
     .excerpt {
       font-family: var(--font-family-body);
-      font-size: 0.875rem;
+      font-size: 1.0625rem;
       line-height: 1.55;
       color: var(--color-text);
-      margin: var(--space-1) 0 0;
+      margin: var(--space-2) 0 0;
       overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -278,10 +278,10 @@ export class HomeViewElement extends HTMLElement {
     }
     .read-link {
       font-family: var(--font-family-body);
-      font-size: 0.8125rem;
+      font-size: 0.9375rem;
       color: var(--color-link);
       text-decoration: none;
-      margin-top: var(--space-1);
+      margin-top: var(--space-2);
     }
     .read-link:hover {
       text-decoration: underline;
@@ -290,13 +290,13 @@ export class HomeViewElement extends HTMLElement {
     /* ── Rating column ── */
     .feed-rating {
       flex-shrink: 0;
-      width: 72px;
+      width: 90px;
       text-align: right;
       padding-top: 2px;
     }
     .rating-num {
       font-family: var(--font-family-display);
-      font-size: 2.5rem;
+      font-size: 3.25rem;
       font-weight: 600;
       color: var(--color-text);
       display: inline-block;
