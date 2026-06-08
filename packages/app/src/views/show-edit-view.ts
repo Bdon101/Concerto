@@ -374,18 +374,22 @@ export class ShowEditViewElement extends HTMLElement {
     const photos = collectPhotos(this.shadowRoot);
     const coverImage = collectCover(this.shadowRoot);
 
+    // Send actual (possibly empty) values rather than collapsing empties to
+    // undefined — JSON.stringify drops undefined keys, which would make the
+    // server keep the old value, so cleared fields (e.g. removing every
+    // photo) wouldn't persist.
     const updated: Show = {
       ...show,
       title,
-      artistName: artistName || undefined,
+      artistName,
       venue,
       datetime,
       date: formatDisplayDate(datetime),
       rating: Number.isNaN(rating) ? undefined : rating,
-      memoryText: memoryText || undefined,
-      songs: songs.length > 0 ? songs : undefined,
-      photos: photos.length > 0 ? photos : undefined,
-      coverImage: coverImage || undefined
+      memoryText,
+      songs,
+      photos,
+      coverImage
     };
 
     const root = this.shadowRoot;
