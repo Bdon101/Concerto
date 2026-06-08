@@ -1,4 +1,4 @@
-import { Show, Artist, Venue } from "server/models";
+import { Show, Artist, Venue, ShareRequest } from "server/models";
 
 export interface Model {
   shows?: Show[];
@@ -7,6 +7,7 @@ export interface Model {
   artist?: Artist;
   venues?: Venue[];
   venue?: Venue;
+  incomingRequests?: ShareRequest[];
 }
 
 export const init: Model = {};

@@ -1,4 +1,4 @@
-import { Show, Artist, Venue } from "server/models";
+import { Show, Artist, Venue, ShareRequest } from "server/models";
 import { Auth } from "@unbndl/auth";
 import { Model } from "./model.ts";
 import { Msg, SaveCallbacks } from "./messages.ts";
@@ -85,6 +85,14 @@ export default function update(
         : model.venues;
       return { ...model, venue: updated, venues };
     }
+    case "shareRequests/request":
+      return [model, requestShareRequests(user)];
+    case "shareRequests/loaded":
+      return { ...model, incomingRequests: message[1].requests };
+    case "share/create":
+      return [model, createShareRequest(message[1], message[2], user)];
+    case "shareRequest/respond":
+      return [model, respondShareRequest(message[1], message[2], user)];
     case "noop":
       return model;
     default: {
@@ -189,6 +197,81 @@ function saveShow(
     .then((updated: Show): Msg => {
       callbacks.onSuccess?.();
       return ["show/loaded", { show: updated }];
+    })
+    .catch((err: Error): Msg => {
+      callbacks.onFailure?.(err);
+      return ["noop"];
+    });
+}
+
+function requestShareRequests(user: Auth.Model): Promise<Msg> {
+  return fetch("/api/share-requests/incoming", { headers: Auth.headers(user) })
+    .then((res) => {
+      redirectIfUnauthorized(res);
+      if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((requests: ShareRequest[]): Msg => [
+      "shareRequests/loaded",
+      { requests }
+    ])
+    .catch((): Msg => ["noop"]);
+}
+
+function createShareRequest(
+  payload: { showId: string; toUsername: string },
+  callbacks: SaveCallbacks,
+  user: Auth.Model
+): Promise<Msg> {
+  return fetch("/api/share-requests", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...Auth.headers(user)
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(async (res) => {
+      redirectIfUnauthorized(res);
+      if (res.status !== 201) {
+        const text = await res.text();
+        throw new Error(text || `Request failed (HTTP ${res.status})`);
+      }
+      return res.json();
+    })
+    .then((): Msg => {
+      callbacks.onSuccess?.();
+      return ["noop"];
+    })
+    .catch((err: Error): Msg => {
+      callbacks.onFailure?.(err);
+      return ["noop"];
+    });
+}
+
+function respondShareRequest(
+  payload: { id: string; action: "accept" | "decline" },
+  callbacks: SaveCallbacks,
+  user: Auth.Model
+): Promise<Msg> {
+  return fetch(
+    `/api/share-requests/${encodeURIComponent(payload.id)}/${payload.action}`,
+    {
+      method: "POST",
+      headers: Auth.headers(user)
+    }
+  )
+    .then((res) => {
+      redirectIfUnauthorized(res);
+      if (res.status !== 200) {
+        throw new Error(`Action failed (HTTP ${res.status})`);
+      }
+      return res.json();
+    })
+    .then((): Msg => {
+      callbacks.onSuccess?.();
+      // Refresh the inbox so the handled request drops off the list.
+      return ["shareRequests/request"];
     })
     .catch((err: Error): Msg => {
       callbacks.onFailure?.(err);
