@@ -1,12 +1,14 @@
 import { css, html, shadow } from "@unbndl/html";
 import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
+import { fromAuth } from "@unbndl/auth";
 import { Show } from "server/models";
 import { Model } from "../model.ts";
 
 interface ShowVM {
   show?: Show;
   showId?: string;
+  username?: string;
 }
 
 function formatRating(show: Show): string {
@@ -19,7 +21,8 @@ export class ShowViewElement extends HTMLElement {
   static observedAttributes = ["show-id"];
 
   viewModel = createViewModel<ShowVM>({})
-    .with(fromStore<Model>(this), "show");
+    .with(fromStore<Model>(this), "show")
+    .with(fromAuth(this), "username");
 
   view = html`
     ${($: ShowVM) => {
@@ -30,6 +33,9 @@ export class ShowViewElement extends HTMLElement {
       const s = $.show;
       const rating = formatRating(s);
       const artistDisplay = s.artistName || s.title;
+      // Missing owner = legacy/own data; treat as owner so the UI isn't locked.
+      const isOwner = !s.ownerUsername || s.ownerUsername === $.username;
+      const sharedWith = s.sharedWith ?? [];
 
       return html`
         <a class="back-link" href="/app">← All concerts</a>
@@ -97,12 +103,35 @@ export class ShowViewElement extends HTMLElement {
 
         <section class="detail-section">
           <p class="section-label">FRIENDS</p>
-          <p class="coming-soon">Tagging friends — coming soon.</p>
+          ${isOwner
+            ? html`
+                ${sharedWith.length > 0
+                  ? html`<ul class="friend-list">
+                      ${sharedWith.map(
+                        (u: string) => html`<li>${u}</li>`
+                      )}
+                    </ul>`
+                  : html`<p class="coming-soon">No friends tagged yet.</p>`}
+                <form class="tag-form" data-tag-form>
+                  <input
+                    name="toUsername"
+                    placeholder="Friend's username"
+                    autocomplete="off"
+                  />
+                  <button type="submit" data-tag-submit>Tag</button>
+                </form>
+                <p class="tag-msg" data-tag-msg></p>
+              `
+            : html`<p class="coming-soon">
+                Shared with you by ${s.ownerUsername ?? "someone"}.
+              </p>`}
         </section>
 
         <hr class="divider" />
 
-        <a class="edit-link" href=${`/app/shows/${s.id}/edit`}>Edit</a>
+        ${isOwner
+          ? html`<a class="edit-link" href=${`/app/shows/${s.id}/edit`}>Edit</a>`
+          : html``}
       `;
     }}
   `;
@@ -111,7 +140,64 @@ export class ShowViewElement extends HTMLElement {
     super();
     shadow(this)
       .styles(ShowViewElement.styles)
-      .replace(this.viewModel.render(this.view));
+      .replace(this.viewModel.render(this.view))
+      .listen({
+        submit: (ev: Event) => this.submitTag(ev)
+      });
+  }
+
+  private submitTag(ev: Event) {
+    ev.preventDefault();
+    const form = ev.target as HTMLFormElement;
+    if (form.dataset.tagForm === undefined) return;
+
+    const { showId } = this.viewModel.toObject() as ShowVM;
+    if (!showId) return;
+
+    const input = form.elements.namedItem(
+      "toUsername"
+    ) as HTMLInputElement | null;
+    const toUsername = (input?.value ?? "").trim();
+
+    const msgEl = this.shadowRoot?.querySelector(
+      "[data-tag-msg]"
+    ) as HTMLElement | null;
+    const btn = form.querySelector(
+      "[data-tag-submit]"
+    ) as HTMLButtonElement | null;
+
+    if (!toUsername) {
+      if (msgEl) {
+        msgEl.textContent = "Enter a username.";
+        msgEl.className = "tag-msg error";
+      }
+      return;
+    }
+
+    if (msgEl) msgEl.textContent = "";
+    if (btn) btn.disabled = true;
+
+    Store.dispatch(this, [
+      "share/create",
+      { showId, toUsername },
+      {
+        onSuccess: () => {
+          if (btn) btn.disabled = false;
+          if (input) input.value = "";
+          if (msgEl) {
+            msgEl.textContent = `Invite sent to ${toUsername}.`;
+            msgEl.className = "tag-msg success";
+          }
+        },
+        onFailure: (err: Error) => {
+          if (btn) btn.disabled = false;
+          if (msgEl) {
+            msgEl.textContent = err.message || String(err);
+            msgEl.className = "tag-msg error";
+          }
+        }
+      }
+    ]);
   }
 
   attributeChangedCallback(
@@ -305,6 +391,72 @@ export class ShowViewElement extends HTMLElement {
       font-size: 0.875rem;
       color: var(--color-border);
       margin: 0;
+    }
+    .friend-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+    .friend-list li {
+      font-family: var(--font-family-body);
+      font-size: 0.8125rem;
+      color: var(--color-text);
+      background: rgba(143, 123, 61, 0.12);
+      border-radius: 999px;
+      padding: 2px var(--space-2);
+    }
+    .tag-form {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+      margin-top: var(--space-1);
+    }
+    .tag-form input {
+      flex: 1;
+      max-width: 260px;
+      border: none;
+      border-bottom: 1px solid var(--color-accent);
+      background: transparent;
+      color: var(--color-text);
+      font: inherit;
+      padding: var(--space-1) 0;
+    }
+    .tag-form input:focus {
+      outline: none;
+      border-bottom-width: 2px;
+    }
+    .tag-form button {
+      border: none;
+      border-radius: 6px;
+      background: var(--color-background-header);
+      color: var(--color-text-inverted);
+      font-family: var(--font-family-body);
+      font-weight: 700;
+      font-size: 0.8125rem;
+      padding: var(--space-1) var(--space-3);
+      cursor: pointer;
+    }
+    .tag-form button[disabled] {
+      opacity: 0.5;
+      cursor: progress;
+    }
+    .tag-msg {
+      font-family: var(--font-family-body);
+      font-size: 0.8125rem;
+      margin: var(--space-1) 0 0;
+      min-height: 1.1em;
+    }
+    .tag-msg:empty {
+      display: none;
+    }
+    .tag-msg.error {
+      color: #b00020;
+    }
+    .tag-msg.success {
+      color: var(--color-link);
     }
 
     /* ── Edit link ── */

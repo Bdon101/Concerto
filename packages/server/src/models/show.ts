@@ -11,4 +11,9 @@ export interface Show {
   rating?: number;
   photos?: string[];
   coverImage?: string;
+  // Set server-side from the JWT; optional here so client create payloads
+  // (which never supply it) remain valid against this interface.
+  ownerUsername?: string;
+  // Usernames granted read-only access via an accepted share request.
+  sharedWith?: string[];
 }

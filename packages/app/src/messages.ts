@@ -1,4 +1,4 @@
-import { Show, Artist, Venue } from "server/models";
+import { Show, Artist, Venue, ShareRequest } from "server/models";
 
 export interface SaveCallbacks {
   onSuccess?: () => void;
@@ -21,4 +21,12 @@ export type Msg =
   | ["venues/loaded", { venues: Venue[] }]
   | ["venue/request", { id: string }]
   | ["venue/loaded", { venue: Venue }]
+  | ["shareRequests/request"]
+  | ["shareRequests/loaded", { requests: ShareRequest[] }]
+  | ["share/create", { showId: string; toUsername: string }, SaveCallbacks]
+  | [
+      "shareRequest/respond",
+      { id: string; action: "accept" | "decline" },
+      SaveCallbacks
+    ]
   | ["noop"];

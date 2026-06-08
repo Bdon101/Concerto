@@ -60,4 +60,11 @@ function verify(username: string, password: string): Promise<string> {
     );
 }
 
-export default { create, verify };
+// Whether a username is registered — used to block tagging non-accounts.
+function exists(username: string): Promise<boolean> {
+  return credentialModel
+    .find({ username })
+    .then((found: Credential[]) => found.length > 0);
+}
+
+export default { create, verify, exists };

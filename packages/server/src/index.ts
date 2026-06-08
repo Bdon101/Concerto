@@ -4,6 +4,7 @@ import path from "node:path";
 import { connect } from "./services/mongo.ts";
 import auth, { authenticateUser } from "./routes/auth.ts";
 import shows from "./routes/shows.ts";
+import shareRequests from "./routes/share-requests.ts";
 import artists from "./routes/artists.ts";
 import venues from "./routes/venues.ts";
 import images, { IMAGES_DIR } from "./routes/images.ts";
@@ -25,6 +26,7 @@ app.use(express.json());
 
 app.use("/auth", auth);
 app.use("/api/shows", authenticateUser, shows);
+app.use("/api/share-requests", authenticateUser, shareRequests);
 app.use("/api/artists", authenticateUser, artists);
 app.use("/api/venues", authenticateUser, venues);
 app.use("/api/images", authenticateUser, images);

@@ -14,39 +14,75 @@ const showSchema = new Schema<Show>(
     memoryText: String,
     rating: Number,
     photos: [String],
-    coverImage: String
+    coverImage: String,
+    ownerUsername: { type: String, required: true },
+    sharedWith: { type: [String], default: [] }
   },
   { collection: "concerto_shows" }
 );
 
 const ShowModel = model<Show>("Show", showSchema);
 
-function index(): Promise<Show[]> {
-  return ShowModel.find();
+// Fields a client must never set/overwrite directly — ownership and the
+// share list are managed server-side via the share-request flow.
+const PROTECTED_FIELDS = ["ownerUsername", "sharedWith"] as const;
+
+function stripProtected(show: Show): Show {
+  const copy = { ...show };
+  for (const field of PROTECTED_FIELDS) delete copy[field];
+  return copy;
 }
 
+// All shows the user owns or has been granted read-only access to.
+function index(username: string): Promise<Show[]> {
+  return ShowModel.find({
+    $or: [{ ownerUsername: username }, { sharedWith: username }]
+  });
+}
+
+// Lookup by id only — the route enforces owner-or-shared access.
 function get(id: string): Promise<Show | null> {
   return ShowModel.findOne({ id });
 }
 
-function create(json: Show): Promise<Show> {
-  const s = new ShowModel(json);
+function create(json: Show, owner: string): Promise<Show> {
+  const s = new ShowModel({
+    ...stripProtected(json),
+    ownerUsername: owner,
+    sharedWith: []
+  });
   return s.save();
 }
 
-function update(id: string, show: Show): Promise<Show> {
-  return ShowModel.findOneAndUpdate({ id }, show, { new: true }).then(
-    (updated) => {
-      if (!updated) throw `${id} not updated`;
-      return updated as Show;
+// Owner-only: shared viewers are read-only, so a non-owner match yields none.
+function update(id: string, show: Show, owner: string): Promise<Show> {
+  return ShowModel.findOneAndUpdate(
+    { id, ownerUsername: owner },
+    stripProtected(show),
+    { new: true }
+  ).then((updated) => {
+    if (!updated) throw `${id} not updated`;
+    return updated as Show;
+  });
+}
+
+// Owner-only delete.
+function remove(id: string, owner: string): Promise<void> {
+  return ShowModel.findOneAndDelete({ id, ownerUsername: owner }).then(
+    (deleted) => {
+      if (!deleted) throw `${id} not deleted`;
     }
   );
 }
 
-function remove(id: string): Promise<void> {
-  return ShowModel.findOneAndDelete({ id }).then((deleted) => {
-    if (!deleted) throw `${id} not deleted`;
-  });
+// Grant a user read-only access to a show (used when a share request is
+// accepted). Idempotent via $addToSet.
+function share(id: string, username: string): Promise<Show | null> {
+  return ShowModel.findOneAndUpdate(
+    { id },
+    { $addToSet: { sharedWith: username } },
+    { new: true }
+  );
 }
 
-export default { index, get, create, update, remove };
+export default { index, get, create, update, remove, share };

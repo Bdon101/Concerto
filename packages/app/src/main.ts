@@ -13,6 +13,7 @@ import { ArtistViewElement } from "./views/artist-view.ts";
 import { VenueViewElement } from "./views/venue-view.ts";
 import { SetlistViewElement } from "./views/setlist-view.ts";
 import { MemoryViewElement } from "./views/memory-view.ts";
+import { RequestsViewElement } from "./views/requests-view.ts";
 import { AuthStatusElement } from "./components/auth-status.ts";
 
 const routes = [
@@ -45,6 +46,10 @@ const routes = [
   {
     path: "/app/venues/:id",
     view: html`<venue-view venue-id=${($: any) => $.params.id}></venue-view>`
+  },
+  {
+    path: "/app/requests",
+    view: html`<requests-view></requests-view>`
   },
   {
     path: "/app",
@@ -80,5 +85,6 @@ define({
   "venue-view": VenueViewElement,
   "setlist-view": SetlistViewElement,
   "memory-view": MemoryViewElement,
+  "requests-view": RequestsViewElement,
   "concerto-auth-status": AuthStatusElement
 });
