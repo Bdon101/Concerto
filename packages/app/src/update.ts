@@ -7,6 +7,25 @@ import { Msg, SaveCallbacks } from "./messages.ts";
 // via Promises (handled by Store's service loop, which re-consumes them).
 export type Cmd = Msg;
 
+const LOGIN_URL = "/login.html";
+
+// When the server rejects a request with 401, the stored token is expired
+// or invalid. The auth provider only checks whether a token is *present*,
+// so a stale token leaves the UI stuck "authenticated" while every request
+// fails — the home list then hangs on "Loading…". Clear the token and send
+// the user to the login page. Throwing afterward lets each request's
+// existing catch fall through to a noop as the browser navigates away.
+function redirectIfUnauthorized(res: Response): void {
+  if (res.status !== 401) return;
+  try {
+    window.localStorage.removeItem(Auth.User.TOKEN_KEY);
+  } catch {
+    // localStorage may be unavailable (e.g. private mode); redirect anyway.
+  }
+  window.location.assign(LOGIN_URL);
+  throw new Error("Unauthorized");
+}
+
 type UpdateResult = Model | [Model, ...Promise<Msg>[]];
 
 export default function update(
@@ -78,6 +97,7 @@ export default function update(
 function requestShows(user: Auth.Model): Promise<Msg> {
   return fetch("/api/shows", { headers: Auth.headers(user) })
     .then((res) => {
+      redirectIfUnauthorized(res);
       if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
@@ -90,6 +110,7 @@ function requestShow(id: string, user: Auth.Model): Promise<Msg> {
     headers: Auth.headers(user)
   })
     .then((res) => {
+      redirectIfUnauthorized(res);
       if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
@@ -100,6 +121,7 @@ function requestShow(id: string, user: Auth.Model): Promise<Msg> {
 function requestArtists(user: Auth.Model): Promise<Msg> {
   return fetch("/api/artists", { headers: Auth.headers(user) })
     .then((res) => {
+      redirectIfUnauthorized(res);
       if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
@@ -112,6 +134,7 @@ function requestArtist(id: string, user: Auth.Model): Promise<Msg> {
     headers: Auth.headers(user)
   })
     .then((res) => {
+      redirectIfUnauthorized(res);
       if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
@@ -122,6 +145,7 @@ function requestArtist(id: string, user: Auth.Model): Promise<Msg> {
 function requestVenues(user: Auth.Model): Promise<Msg> {
   return fetch("/api/venues", { headers: Auth.headers(user) })
     .then((res) => {
+      redirectIfUnauthorized(res);
       if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
@@ -134,6 +158,7 @@ function requestVenue(id: string, user: Auth.Model): Promise<Msg> {
     headers: Auth.headers(user)
   })
     .then((res) => {
+      redirectIfUnauthorized(res);
       if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
@@ -155,6 +180,7 @@ function saveShow(
     body: JSON.stringify(payload.show)
   })
     .then((res) => {
+      redirectIfUnauthorized(res);
       if (res.status !== 200) {
         throw new Error(`Save failed (HTTP ${res.status})`);
       }
@@ -184,6 +210,7 @@ function createShow(
     body: JSON.stringify(payload.show)
   })
     .then((res) => {
+      redirectIfUnauthorized(res);
       if (res.status !== 201) {
         throw new Error(`Create failed (HTTP ${res.status})`);
       }
