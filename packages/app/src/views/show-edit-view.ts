@@ -4,6 +4,8 @@ import { Store, fromStore } from "@unbndl/store";
 import { Show } from "server/models";
 import { Model } from "../model.ts";
 
+const DEFAULT_RATING = 5;
+
 interface EditVM {
   show?: Show;
   showId?: string;
@@ -12,34 +14,100 @@ interface EditVM {
 export class ShowEditViewElement extends HTMLElement {
   static observedAttributes = ["show-id"];
 
+  private songCount = 0;
+
   viewModel = createViewModel<EditVM>({})
     .with(fromStore<Model>(this), "show");
 
   view = html`
-    <article class="edit">
+    <article class="form-page">
       ${($: EditVM) => {
-        if (!$.showId) return html`<p>No show selected.</p>`;
+        if (!$.showId) return html`<p class="status">No show selected.</p>`;
         if (!$.show || $.show.id !== $.showId)
-          return html`<p>Loading…</p>`;
+          return html`<p class="status">Loading…</p>`;
+
+        const s = $.show;
+        const rating = (s as Show & { rating?: number }).rating ?? DEFAULT_RATING;
+        const songs = s.songs ?? [];
+
         return html`
-          <h1>Edit show</h1>
+          <header class="form-header">
+            <h1>Edit concert</h1>
+          </header>
+
           <form data-edit-form>
-            <label>
-              <span>Title</span>
-              <input name="title" value=${$.show.title} required />
-            </label>
-            <label>
-              <span>Venue</span>
-              <input name="venue" value=${$.show.venue} required />
-            </label>
-            <label>
-              <span>Date</span>
-              <input type="date" name="datetime" value=${$.show.datetime} required />
-            </label>
+            <section class="field-group">
+              <label class="field">
+                <span class="field-label">Title</span>
+                <input name="title" value=${s.title} required />
+              </label>
+              <label class="field">
+                <span class="field-label">Artist</span>
+                <input name="artistName" value=${s.artistName ?? ""} />
+              </label>
+              <label class="field">
+                <span class="field-label">Venue</span>
+                <input name="venue" value=${s.venue} required />
+              </label>
+              <label class="field">
+                <span class="field-label">Date</span>
+                <input type="date" name="datetime" value=${s.datetime} required />
+              </label>
+            </section>
+
+            <section class="rating-section">
+              <span class="field-label">Rating</span>
+              <div class="rating-row">
+                <input
+                  type="range"
+                  name="rating"
+                  min="1"
+                  max="10"
+                  step="0.1"
+                  value=${String(rating)}
+                  data-rating-slider
+                />
+                <span class="rating-display" data-rating-display
+                  >${rating.toFixed(1)}</span
+                >
+              </div>
+            </section>
+
+            <section class="memory-section">
+              <span class="field-label">Memory</span>
+              <textarea
+                name="memoryText"
+                rows="6"
+                placeholder="What do you remember about this night?"
+              >${s.memoryText ?? ""}</textarea>
+            </section>
+
+            <section class="setlist-section">
+              <span class="field-label">Setlist</span>
+              <div data-song-list>
+                ${songs.map(
+                  (song: string, i: number) => html`
+                    <div class="song-row">
+                      <span class="song-num">${i + 1}.</span>
+                      <input
+                        class="song-input"
+                        name=${`song-existing-${i}`}
+                        value=${song}
+                      />
+                    </div>
+                  `
+                )}
+              </div>
+              <button type="button" class="add-song" data-add-song>
+                + Add a song
+              </button>
+            </section>
+
             <p class="error" data-error></p>
+
             <div class="actions">
-              <button type="submit" data-submit>Save</button>
-              <a href=${`/app/shows/${$.show.id}`}>Cancel</a>
+              <button type="submit" class="save-btn" data-submit>Save</button>
+              <a class="cancel-link" href=${`/app/shows/${s.id}`}>Cancel</a>
             </div>
           </form>
         `;
@@ -53,7 +121,9 @@ export class ShowEditViewElement extends HTMLElement {
       .styles(ShowEditViewElement.styles)
       .replace(this.viewModel.render(this.view))
       .listen({
-        submit: (ev: Event) => this.submitForm(ev)
+        submit: (ev: Event) => this.submitForm(ev),
+        input: (ev: Event) => this.handleInput(ev),
+        click: (ev: Event) => this.handleClick(ev)
       });
   }
 
@@ -81,21 +151,66 @@ export class ShowEditViewElement extends HTMLElement {
     Store.dispatch(this, ["show/request", { id: showId }]);
   }
 
+  private handleInput(ev: Event) {
+    const target = ev.target as HTMLElement;
+    if (!target.hasAttribute("data-rating-slider")) return;
+    const value = (target as HTMLInputElement).value;
+    const display = this.shadowRoot?.querySelector(
+      "[data-rating-display]"
+    ) as HTMLElement | null;
+    if (display) display.textContent = parseFloat(value).toFixed(1);
+  }
+
+  private handleClick(ev: Event) {
+    const target = ev.target as HTMLElement;
+    if (target.dataset.addSong !== undefined) this.addSong();
+  }
+
+  private addSong() {
+    const list = this.shadowRoot?.querySelector(
+      "[data-song-list]"
+    ) as HTMLElement | null;
+    if (!list) return;
+    this.songCount += 1;
+    const existing = list.querySelectorAll(".song-row").length;
+    const row = document.createElement("div");
+    row.className = "song-row";
+    const num = document.createElement("span");
+    num.className = "song-num";
+    num.textContent = `${existing + 1}.`;
+    const input = document.createElement("input");
+    input.className = "song-input";
+    input.name = `song-add-${this.songCount}`;
+    row.appendChild(num);
+    row.appendChild(input);
+    list.appendChild(row);
+    input.focus();
+  }
+
   private submitForm(ev: Event) {
     ev.preventDefault();
     const { showId, show } = this.viewModel.toObject() as EditVM;
     if (!showId || !show) return;
 
     const form = ev.target as HTMLFormElement;
-    const data = formDataToJSON(form);
-    const datetime = data.datetime;
+    const title = getValue(form, "title");
+    const artistName = getValue(form, "artistName");
+    const venue = getValue(form, "venue");
+    const datetime = getValue(form, "datetime");
+    const memoryText = getValue(form, "memoryText");
+    const rating = parseFloat(getValue(form, "rating"));
+    const songs = collectSongs(form);
 
     const updated: Show = {
       ...show,
-      title: data.title,
-      venue: data.venue,
+      title,
+      artistName: artistName || undefined,
+      venue,
       datetime,
-      date: formatDisplayDate(datetime)
+      date: formatDisplayDate(datetime),
+      rating: Number.isNaN(rating) ? undefined : rating,
+      memoryText: memoryText || undefined,
+      songs: songs.length > 0 ? songs : undefined
     };
 
     const root = this.shadowRoot;
@@ -130,66 +245,173 @@ export class ShowEditViewElement extends HTMLElement {
   static styles = css`
     :host {
       display: block;
-      padding: var(--space-4);
-      background-color: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
+      max-width: 640px;
+      margin: 0 auto;
     }
-    .edit {
-      display: grid;
-      gap: var(--space-3);
+
+    .status {
+      font-family: var(--font-family-body);
+      font-style: italic;
+      color: var(--color-border);
+    }
+
+    /* ── Header ── */
+    .form-header {
+      margin-bottom: var(--space-4);
     }
     h1 {
-      color: var(--color-heading);
       font-family: var(--font-family-display);
-      font-size: 1.6rem;
+      font-size: 2.25rem;
       font-weight: 600;
+      color: var(--color-heading);
+      margin: 0;
     }
+
     form {
-      display: grid;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Section dividers ── */
+    section {
+      padding: var(--space-4) 0;
+      border-top: 1px solid rgba(143, 123, 61, 0.35);
+    }
+    section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    /* ── Field labels ── */
+    .field-label {
+      display: block;
+      font-family: var(--font-family-body);
+      font-size: 0.625rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-1);
+    }
+
+    /* ── Basics ── */
+    .field-group {
+      display: flex;
+      flex-direction: column;
       gap: var(--space-3);
     }
-    label {
-      display: grid;
-      gap: var(--space-1);
+    .field {
+      display: block;
     }
-    input {
-      padding: var(--space-2);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
-      background: var(--color-background-page);
+
+    /* ── Shared input style ── */
+    input,
+    textarea {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid var(--color-accent);
+      border-radius: 0;
+      background: transparent;
       color: var(--color-text);
       font: inherit;
+      padding: var(--space-2) 0;
     }
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-bottom-width: 2px;
+    }
+    textarea {
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    /* ── Rating ── */
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    input[type="range"] {
+      flex: 1;
+      border: none;
+      padding: 0;
+      accent-color: var(--color-link);
+      cursor: pointer;
+    }
+    .rating-display {
+      font-family: var(--font-family-display);
+      font-size: 3.5rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      line-height: 1;
+      min-width: 5rem;
+      text-align: right;
+    }
+
+    /* ── Setlist ── */
+    .song-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+    .song-num {
+      font-family: var(--font-family-display);
+      color: var(--color-accent);
+      flex-shrink: 0;
+    }
+    .add-song {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-family: var(--font-family-body);
+      font-size: 0.875rem;
+      color: var(--color-link);
+    }
+    .add-song:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Footer actions ── */
     .actions {
       display: flex;
-      gap: var(--space-3);
       align-items: center;
+      gap: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid rgba(143, 123, 61, 0.35);
     }
-    button {
-      padding: var(--space-2) var(--space-3);
-      border: 1px solid var(--color-border);
+    .save-btn {
+      padding: var(--space-2) var(--space-4);
+      border: none;
+      border-radius: 6px;
       background: var(--color-background-header);
       color: var(--color-text-inverted);
+      font-family: var(--font-family-body);
+      font-weight: 700;
+      font-size: 0.9375rem;
       cursor: pointer;
-      border-radius: var(--radius-card);
-      font: inherit;
     }
-    button[disabled] {
+    .save-btn[disabled] {
       opacity: 0.5;
       cursor: progress;
     }
-    a {
+    .cancel-link {
+      font-family: var(--font-family-body);
+      font-size: 0.875rem;
       color: var(--color-link);
       text-decoration: none;
     }
-    a:hover {
+    .cancel-link:hover {
       text-decoration: underline;
     }
+
+    /* ── Error ── */
     .error {
       color: #b00020;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
       min-height: 1.2em;
+      margin: var(--space-2) 0 0;
     }
     .error:empty {
       display: none;
@@ -197,11 +419,18 @@ export class ShowEditViewElement extends HTMLElement {
   `;
 }
 
-function formDataToJSON(form: HTMLFormElement): Record<string, string> {
-  const inputs = Array.from(form.querySelectorAll("input"));
-  return Object.fromEntries(
-    inputs.filter((el) => el.name).map((el) => [el.name, el.value])
-  );
+function getValue(form: HTMLFormElement, name: string): string {
+  const el = form.elements.namedItem(name) as
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | null;
+  return el ? el.value : "";
+}
+
+function collectSongs(form: HTMLFormElement): string[] {
+  return Array.from(form.querySelectorAll<HTMLInputElement>('[name^="song-"]'))
+    .map((el) => el.value.trim())
+    .filter(Boolean);
 }
 
 function formatDisplayDate(yyyyMmDd: string): string {

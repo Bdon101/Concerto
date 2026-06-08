@@ -11,7 +11,8 @@ const showSchema = new Schema<Show>(
     href: String,
     artistName: String,
     songs: [String],
-    memoryText: String
+    memoryText: String,
+    rating: Number
   },
   { collection: "concerto_shows" }
 );

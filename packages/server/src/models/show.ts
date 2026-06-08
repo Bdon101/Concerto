@@ -8,4 +8,5 @@ export interface Show {
   artistName?: string;
   songs?: string[];
   memoryText?: string;
+  rating?: number;
 }
