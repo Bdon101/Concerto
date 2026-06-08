@@ -1,0 +1,42 @@
+:host {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: var(--color-text-inverted);
+}
+.when-signed-in,
+.when-signed-out {
+  display: none;
+}
+.logged-in .when-signed-in {
+  display: inline;
+}
+.logged-out .when-signed-out {
+  display: inline;
+}
+a {
+  color: var(--color-text-inverted);
+  text-decoration: underline;
+}
+.badge {
+  display: inline-block;
+  min-width: 1.1em;
+  margin-left: 4px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-text-inverted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  vertical-align: baseline;
+}
+button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  padding: 0;
+  color: var(--color-text-inverted);
+}

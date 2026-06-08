@@ -3,6 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { Show } from "server/models";
 import { Model } from "../model.ts";
+import rawStyles from "./setlist-view.css?inline";
 
 interface SetlistVM {
   show?: Show;
@@ -73,35 +74,5 @@ export class SetlistViewElement extends HTMLElement {
     );
   }
 
-  static styles = css`
-    :host {
-      display: block;
-      padding: var(--space-4);
-      background-color: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
-    }
-    article {
-      display: grid;
-      gap: var(--space-3);
-    }
-    h1 {
-      color: var(--color-heading);
-      font-family: var(--font-family-display);
-      font-size: 1.6rem;
-      font-weight: 700;
-    }
-    ol.songs {
-      padding-left: 1.5rem;
-      display: grid;
-      gap: var(--space-1);
-    }
-    .back a {
-      color: var(--color-link);
-      text-decoration: none;
-    }
-    .back a:hover {
-      text-decoration: underline;
-    }
-  `;
+  static styles = css`${rawStyles}`;
 }

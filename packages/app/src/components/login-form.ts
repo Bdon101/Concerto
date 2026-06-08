@@ -1,4 +1,5 @@
 import { css, html, shadow } from "@unbndl/html";
+import rawStyles from "./login-form.css?inline";
 
 export class LoginFormElement extends HTMLElement {
   constructor() {
@@ -61,33 +62,5 @@ export class LoginFormElement extends HTMLElement {
     );
   }
 
-  static styles = css`
-    form {
-      display: grid;
-      gap: var(--space-3);
-      max-width: 360px;
-    }
-    ::slotted(label) {
-      display: grid;
-      gap: var(--space-1);
-    }
-    button {
-      justify-self: start;
-      padding: var(--space-2) var(--space-3);
-      border: 1px solid var(--color-border);
-      background: var(--color-background-header);
-      color: var(--color-text-inverted);
-      cursor: pointer;
-      border-radius: var(--radius-card);
-      font: inherit;
-    }
-    .error {
-      color: #b00020;
-      min-height: 1.2em;
-      font-size: 0.9rem;
-    }
-    .error:empty {
-      display: none;
-    }
-  `;
+  static styles = css`${rawStyles}`;
 }

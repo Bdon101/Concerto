@@ -3,6 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { Venue, Show } from "server/models";
 import { Model } from "../model.ts";
+import rawStyles from "./venue-view.css?inline";
 
 interface VenueVM {
   venue?: Venue;
@@ -83,50 +84,5 @@ export class VenueViewElement extends HTMLElement {
     }, 0);
   }
 
-  static styles = css`
-    :host {
-      display: block;
-      padding: var(--space-4);
-      background-color: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
-    }
-    article {
-      display: grid;
-      gap: var(--space-2);
-    }
-    h1 {
-      color: var(--color-heading);
-      font-family: var(--font-family-display);
-      font-size: 2rem;
-      font-weight: 700;
-    }
-    h2 {
-      color: var(--color-link);
-      font-family: var(--font-family-display);
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-top: var(--space-3);
-    }
-    .city {
-      font-size: 0.95rem;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      display: grid;
-      gap: var(--space-2);
-    }
-    time {
-      font-family: var(--font-family-display);
-      color: var(--color-link);
-    }
-    a {
-      color: var(--color-link);
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  `;
+  static styles = css`${rawStyles}`;
 }
