@@ -82,11 +82,15 @@ export class HomeViewElement extends HTMLElement {
             `
           : html`
               <div class="feed">
-                ${sorted.map((s: Show) => html`
+                ${sorted.map((s: Show) => {
+                  const thumb = s.coverImage || s.photos?.[0];
+                  return html`
                   <div class="feed-row">
-                    ${s.photos?.length
-                      ? html`<img class="photo-thumb" src=${s.photos[0]} alt="" />`
-                      : html`<div class="photo-thumb" aria-hidden="true"></div>`}
+                    <div class="thumb-wrap">
+                      ${thumb
+                        ? html`<img class="thumb-polaroid" src=${thumb} alt="" />`
+                        : html`<div class="thumb-polaroid placeholder" aria-hidden="true"></div>`}
+                    </div>
                     <div class="feed-mid">
                       <h2 class="show-title">
                         <a href=${s.href}>${s.title}</a>
@@ -103,7 +107,8 @@ export class HomeViewElement extends HTMLElement {
                       <span class="rating-num">${formatRating(s)}</span>
                     </div>
                   </div>
-                `)}
+                `;
+                })}
               </div>
             `}
       `;
@@ -209,14 +214,26 @@ export class HomeViewElement extends HTMLElement {
     }
 
     /* ── Photo placeholder ── */
-    .photo-thumb {
-      width: 88px;
-      height: 88px;
+    .thumb-wrap {
       flex-shrink: 0;
+      padding-top: var(--space-1);
+    }
+    .thumb-polaroid {
+      display: block;
+      width: 160px;
+      height: 120px;
       object-fit: cover;
-      background-color: var(--color-surface);
-      border-radius: 4px;
-      border: 1px solid var(--color-border);
+      background: #fff;
+      border: 7px solid #fff;
+      border-bottom-width: 24px;
+      box-shadow: 0 2px 9px rgba(0, 0, 0, 0.22);
+      transform: rotate(-2deg);
+    }
+    .thumb-polaroid.placeholder {
+      background: linear-gradient(135deg, var(--color-surface) 0%, #c4ae8f 100%);
+    }
+    .feed-row:nth-child(even) .thumb-polaroid {
+      transform: rotate(1.5deg);
     }
 
     /* ── Middle column ── */
