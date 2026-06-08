@@ -10,6 +10,13 @@ import credentials from "../services/credential-svc.ts";
 
 const router = express.Router();
 
+// An authenticated request carries the username decoded from the JWT, so
+// downstream routes know who is acting without re-parsing the token.
+// Generic over route params so callers can keep `Request<{ id: string }>`.
+export interface AuthedRequest<P = Record<string, string>> extends Request<P> {
+  user?: string;
+}
+
 dotenv.config();
 const TOKEN_SECRET: string =
   process.env.TOKEN_SECRET || "NOT_A_SECRET";
@@ -72,8 +79,10 @@ export function authenticateUser(
     res.status(401).end();
   } else {
     jwt.verify(token, TOKEN_SECRET, (error, decoded) => {
-      if (decoded) next();
-      else res.status(401).end();
+      if (decoded && typeof decoded === "object" && "username" in decoded) {
+        (req as AuthedRequest).user = (decoded as { username: string }).username;
+        next();
+      } else res.status(401).end();
     });
   }
 }
