@@ -61,6 +61,26 @@ export class ShowViewElement extends HTMLElement {
 
         <hr class="divider" />
 
+        ${(s.photos?.length ?? 0) > 0
+          ? html`
+              <section class="detail-section">
+                <p class="section-label">PHOTOS</p>
+                <div class="photo-grid">
+                  ${(s.photos ?? []).map(
+                    (url: string, i: number) => html`
+                      <img
+                        class="polaroid"
+                        src=${url}
+                        alt=${`Photo ${i + 1}`}
+                      />
+                    `
+                  )}
+                </div>
+              </section>
+              <hr class="divider" />
+            `
+          : html``}
+
         ${(s.songs?.length ?? 0) > 0
           ? html`
               <section class="detail-section">
@@ -231,6 +251,28 @@ export class ShowViewElement extends HTMLElement {
     }
     .empty-cta a:hover {
       text-decoration: underline;
+    }
+
+    /* ── Photos ── */
+    .photo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+    .polaroid {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      background: #fff;
+      border: 8px solid #fff;
+      border-bottom-width: 28px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+    }
+    .polaroid:nth-child(odd) {
+      transform: rotate(-2deg);
+    }
+    .polaroid:nth-child(even) {
+      transform: rotate(1.5deg);
     }
 
     /* ── Setlist ── */

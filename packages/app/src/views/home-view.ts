@@ -84,7 +84,9 @@ export class HomeViewElement extends HTMLElement {
               <div class="feed">
                 ${sorted.map((s: Show) => html`
                   <div class="feed-row">
-                    <div class="photo-thumb" aria-hidden="true"></div>
+                    ${s.photos?.length
+                      ? html`<img class="photo-thumb" src=${s.photos[0]} alt="" />`
+                      : html`<div class="photo-thumb" aria-hidden="true"></div>`}
                     <div class="feed-mid">
                       <h2 class="show-title">
                         <a href=${s.href}>${s.title}</a>
@@ -211,6 +213,7 @@ export class HomeViewElement extends HTMLElement {
       width: 88px;
       height: 88px;
       flex-shrink: 0;
+      object-fit: cover;
       background-color: var(--color-surface);
       border-radius: 4px;
       border: 1px solid var(--color-border);

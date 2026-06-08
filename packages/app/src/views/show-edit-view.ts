@@ -3,6 +3,7 @@ import { createViewModel } from "@unbndl/view";
 import { Store, fromStore } from "@unbndl/store";
 import { Show } from "server/models";
 import { Model } from "../model.ts";
+import { uploadImage } from "../lib/images.ts";
 
 const DEFAULT_RATING = 5;
 
@@ -79,7 +80,34 @@ export class ShowEditViewElement extends HTMLElement {
                 name="memoryText"
                 rows="6"
                 placeholder="What do you remember about this night?"
-              >${s.memoryText ?? ""}</textarea>
+                .value=${s.memoryText ?? ""}
+              ></textarea>
+            </section>
+
+            <section class="photos-section">
+              <span class="field-label">Photos</span>
+              <div class="photo-zone" data-photo-zone>
+                ⬆ Drop photos here, or click to add.
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                class="visually-hidden"
+                data-photo-input
+              />
+              <div class="photo-previews" data-photo-previews>
+                ${(s.photos ?? []).map(
+                  (url: string) => html`
+                    <img
+                      class="photo-preview"
+                      src=${url}
+                      data-url=${url}
+                      alt=""
+                    />
+                  `
+                )}
+              </div>
             </section>
 
             <section class="setlist-section">
@@ -123,8 +151,41 @@ export class ShowEditViewElement extends HTMLElement {
       .listen({
         submit: (ev: Event) => this.submitForm(ev),
         input: (ev: Event) => this.handleInput(ev),
-        click: (ev: Event) => this.handleClick(ev)
+        click: (ev: Event) => this.handleClick(ev),
+        change: (ev: Event) => this.handleChange(ev)
       });
+  }
+
+  private handleChange(ev: Event) {
+    const target = ev.target as HTMLInputElement;
+    if (target.dataset.photoInput === undefined) return;
+    const files = target.files ? Array.from(target.files) : [];
+    files.forEach((file) => this.uploadPhoto(file));
+    target.value = ""; // allow re-selecting the same file
+  }
+
+  private uploadPhoto(file: File) {
+    uploadImage(file)
+      .then((url) => this.addPhoto(url))
+      .catch((err: Error) => {
+        const errEl = this.shadowRoot?.querySelector(
+          "[data-error]"
+        ) as HTMLElement | null;
+        if (errEl) errEl.textContent = err.message || String(err);
+      });
+  }
+
+  private addPhoto(url: string) {
+    const container = this.shadowRoot?.querySelector(
+      "[data-photo-previews]"
+    ) as HTMLElement | null;
+    if (!container) return;
+    const img = document.createElement("img");
+    img.src = url;
+    img.dataset.url = url;
+    img.className = "photo-preview";
+    img.alt = "";
+    container.appendChild(img);
   }
 
   attributeChangedCallback(
@@ -163,7 +224,16 @@ export class ShowEditViewElement extends HTMLElement {
 
   private handleClick(ev: Event) {
     const target = ev.target as HTMLElement;
-    if (target.dataset.addSong !== undefined) this.addSong();
+    if (target.dataset.addSong !== undefined) {
+      this.addSong();
+      return;
+    }
+    if (target.closest("[data-photo-zone]")) {
+      const input = this.shadowRoot?.querySelector(
+        "[data-photo-input]"
+      ) as HTMLInputElement | null;
+      input?.click();
+    }
   }
 
   private addSong() {
@@ -200,6 +270,7 @@ export class ShowEditViewElement extends HTMLElement {
     const memoryText = getValue(form, "memoryText");
     const rating = parseFloat(getValue(form, "rating"));
     const songs = collectSongs(form);
+    const photos = collectPhotos(this.shadowRoot);
 
     const updated: Show = {
       ...show,
@@ -210,7 +281,8 @@ export class ShowEditViewElement extends HTMLElement {
       date: formatDisplayDate(datetime),
       rating: Number.isNaN(rating) ? undefined : rating,
       memoryText: memoryText || undefined,
-      songs: songs.length > 0 ? songs : undefined
+      songs: songs.length > 0 ? songs : undefined,
+      photos: photos.length > 0 ? photos : undefined
     };
 
     const root = this.shadowRoot;
@@ -304,7 +376,7 @@ export class ShowEditViewElement extends HTMLElement {
     }
 
     /* ── Shared input style ── */
-    input,
+    input:not([type="file"]),
     textarea {
       width: 100%;
       border: none;
@@ -315,10 +387,24 @@ export class ShowEditViewElement extends HTMLElement {
       font: inherit;
       padding: var(--space-2) 0;
     }
-    input:focus,
+    input:not([type="file"]):focus,
     textarea:focus {
       outline: none;
       border-bottom-width: 2px;
+    }
+
+    /* Visually hidden but still rendered, so the file input stays
+       interactable (real clicks + automation) unlike display:none. */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
     textarea {
       resize: vertical;
@@ -346,6 +432,37 @@ export class ShowEditViewElement extends HTMLElement {
       line-height: 1;
       min-width: 5rem;
       text-align: right;
+    }
+
+    /* ── Photos ── */
+    .photo-zone {
+      display: block;
+      border: 1.5px dashed var(--color-accent);
+      border-radius: 6px;
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--font-family-body);
+      font-style: italic;
+      font-size: 0.875rem;
+      color: var(--color-border);
+      cursor: pointer;
+    }
+    .photo-zone:hover {
+      background: rgba(143, 123, 61, 0.06);
+    }
+    .photo-previews {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+    }
+    .photo-preview {
+      width: 96px;
+      height: 96px;
+      object-fit: cover;
+      border: 4px solid #fff;
+      border-radius: 2px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22);
     }
 
     /* ── Setlist ── */
@@ -430,6 +547,15 @@ function getValue(form: HTMLFormElement, name: string): string {
 function collectSongs(form: HTMLFormElement): string[] {
   return Array.from(form.querySelectorAll<HTMLInputElement>('[name^="song-"]'))
     .map((el) => el.value.trim())
+    .filter(Boolean);
+}
+
+function collectPhotos(root: ShadowRoot | null): string[] {
+  if (!root) return [];
+  return Array.from(
+    root.querySelectorAll<HTMLImageElement>("[data-photo-previews] img")
+  )
+    .map((img) => img.dataset.url || "")
     .filter(Boolean);
 }
 
