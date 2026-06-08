@@ -122,12 +122,22 @@ export class ShowEditViewElement extends HTMLElement {
               <div class="photo-previews" data-photo-previews>
                 ${(s.photos ?? []).map(
                   (url: string) => html`
-                    <img
-                      class="photo-preview"
-                      src=${url}
-                      data-url=${url}
-                      alt=""
-                    />
+                    <div class="photo-preview-wrap">
+                      <img
+                        class="photo-preview"
+                        src=${url}
+                        data-url=${url}
+                        alt=""
+                      />
+                      <button
+                        type="button"
+                        class="photo-remove"
+                        data-remove-photo
+                        aria-label="Remove photo"
+                      >
+                        ×
+                      </button>
+                    </div>
                   `
                 )}
               </div>
@@ -145,6 +155,14 @@ export class ShowEditViewElement extends HTMLElement {
                         name=${`song-existing-${i}`}
                         value=${song}
                       />
+                      <button
+                        type="button"
+                        class="song-remove"
+                        data-remove-song
+                        aria-label="Remove song"
+                      >
+                        ×
+                      </button>
                     </div>
                   `
                 )}
@@ -216,12 +234,22 @@ export class ShowEditViewElement extends HTMLElement {
       "[data-photo-previews]"
     ) as HTMLElement | null;
     if (!container) return;
+    const wrap = document.createElement("div");
+    wrap.className = "photo-preview-wrap";
     const img = document.createElement("img");
     img.src = url;
     img.dataset.url = url;
     img.className = "photo-preview";
     img.alt = "";
-    container.appendChild(img);
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "photo-remove";
+    remove.dataset.removePhoto = "";
+    remove.setAttribute("aria-label", "Remove photo");
+    remove.textContent = "×";
+    wrap.appendChild(img);
+    wrap.appendChild(remove);
+    container.appendChild(wrap);
   }
 
   private setCover(url: string) {
@@ -278,6 +306,14 @@ export class ShowEditViewElement extends HTMLElement {
       this.addSong();
       return;
     }
+    if (target.closest("[data-remove-photo]")) {
+      target.closest(".photo-preview-wrap")?.remove();
+      return;
+    }
+    if (target.closest("[data-remove-song]")) {
+      target.closest(".song-row")?.remove();
+      return;
+    }
     if (target.closest("[data-photo-zone]")) {
       const input = this.shadowRoot?.querySelector(
         "[data-photo-input]"
@@ -308,8 +344,15 @@ export class ShowEditViewElement extends HTMLElement {
     const input = document.createElement("input");
     input.className = "song-input";
     input.name = `song-add-${this.songCount}`;
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "song-remove";
+    remove.dataset.removeSong = "";
+    remove.setAttribute("aria-label", "Remove song");
+    remove.textContent = "×";
     row.appendChild(num);
     row.appendChild(input);
+    row.appendChild(remove);
     list.appendChild(row);
     input.focus();
   }
@@ -515,6 +558,10 @@ export class ShowEditViewElement extends HTMLElement {
       gap: var(--space-3);
       margin-top: var(--space-3);
     }
+    .photo-preview-wrap {
+      position: relative;
+      display: inline-block;
+    }
     .photo-preview {
       width: 96px;
       height: 96px;
@@ -522,6 +569,26 @@ export class ShowEditViewElement extends HTMLElement {
       border: 4px solid #fff;
       border-radius: 2px;
       box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22);
+      display: block;
+    }
+    .photo-remove {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+    .photo-remove:hover {
+      background: var(--color-accent);
     }
 
     /* ── Cover image preview ── */
@@ -547,6 +614,23 @@ export class ShowEditViewElement extends HTMLElement {
       font-family: var(--font-family-display);
       color: var(--color-accent);
       flex-shrink: 0;
+    }
+    .song-remove {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: none;
+      color: var(--color-link);
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .song-remove:hover {
+      background: rgba(143, 123, 61, 0.12);
+      color: var(--color-accent);
     }
     .add-song {
       background: none;
