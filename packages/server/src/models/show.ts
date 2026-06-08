@@ -10,4 +10,5 @@ export interface Show {
   memoryText?: string;
   rating?: number;
   photos?: string[];
+  coverImage?: string;
 }

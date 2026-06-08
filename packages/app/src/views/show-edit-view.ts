@@ -56,6 +56,29 @@ export class ShowEditViewElement extends HTMLElement {
               </label>
             </section>
 
+            <section class="cover-section">
+              <span class="field-label">Cover image</span>
+              <div class="photo-zone" data-cover-zone>
+                ⬆ Add a header image for this show.
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                class="visually-hidden"
+                data-cover-input
+              />
+              <div class="cover-preview" data-cover-preview>
+                ${s.coverImage
+                  ? html`<img
+                      class="cover-thumb"
+                      src=${s.coverImage}
+                      data-url=${s.coverImage}
+                      alt=""
+                    />`
+                  : html``}
+              </div>
+            </section>
+
             <section class="rating-section">
               <span class="field-label">Rating</span>
               <div class="rating-row">
@@ -158,21 +181,34 @@ export class ShowEditViewElement extends HTMLElement {
 
   private handleChange(ev: Event) {
     const target = ev.target as HTMLInputElement;
-    if (target.dataset.photoInput === undefined) return;
     const files = target.files ? Array.from(target.files) : [];
-    files.forEach((file) => this.uploadPhoto(file));
+    if (target.dataset.photoInput !== undefined) {
+      files.forEach((file) => this.uploadPhoto(file));
+    } else if (target.dataset.coverInput !== undefined) {
+      if (files[0]) this.uploadCover(files[0]);
+    } else {
+      return;
+    }
     target.value = ""; // allow re-selecting the same file
   }
 
   private uploadPhoto(file: File) {
     uploadImage(file)
       .then((url) => this.addPhoto(url))
-      .catch((err: Error) => {
-        const errEl = this.shadowRoot?.querySelector(
-          "[data-error]"
-        ) as HTMLElement | null;
-        if (errEl) errEl.textContent = err.message || String(err);
-      });
+      .catch((err: Error) => this.showError(err));
+  }
+
+  private uploadCover(file: File) {
+    uploadImage(file)
+      .then((url) => this.setCover(url))
+      .catch((err: Error) => this.showError(err));
+  }
+
+  private showError(err: Error) {
+    const errEl = this.shadowRoot?.querySelector(
+      "[data-error]"
+    ) as HTMLElement | null;
+    if (errEl) errEl.textContent = err.message || String(err);
   }
 
   private addPhoto(url: string) {
@@ -184,6 +220,20 @@ export class ShowEditViewElement extends HTMLElement {
     img.src = url;
     img.dataset.url = url;
     img.className = "photo-preview";
+    img.alt = "";
+    container.appendChild(img);
+  }
+
+  private setCover(url: string) {
+    const container = this.shadowRoot?.querySelector(
+      "[data-cover-preview]"
+    ) as HTMLElement | null;
+    if (!container) return;
+    container.replaceChildren();
+    const img = document.createElement("img");
+    img.src = url;
+    img.dataset.url = url;
+    img.className = "cover-thumb";
     img.alt = "";
     container.appendChild(img);
   }
@@ -233,6 +283,13 @@ export class ShowEditViewElement extends HTMLElement {
         "[data-photo-input]"
       ) as HTMLInputElement | null;
       input?.click();
+      return;
+    }
+    if (target.closest("[data-cover-zone]")) {
+      const input = this.shadowRoot?.querySelector(
+        "[data-cover-input]"
+      ) as HTMLInputElement | null;
+      input?.click();
     }
   }
 
@@ -271,6 +328,7 @@ export class ShowEditViewElement extends HTMLElement {
     const rating = parseFloat(getValue(form, "rating"));
     const songs = collectSongs(form);
     const photos = collectPhotos(this.shadowRoot);
+    const coverImage = collectCover(this.shadowRoot);
 
     const updated: Show = {
       ...show,
@@ -282,7 +340,8 @@ export class ShowEditViewElement extends HTMLElement {
       rating: Number.isNaN(rating) ? undefined : rating,
       memoryText: memoryText || undefined,
       songs: songs.length > 0 ? songs : undefined,
-      photos: photos.length > 0 ? photos : undefined
+      photos: photos.length > 0 ? photos : undefined,
+      coverImage: coverImage || undefined
     };
 
     const root = this.shadowRoot;
@@ -465,6 +524,18 @@ export class ShowEditViewElement extends HTMLElement {
       box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22);
     }
 
+    /* ── Cover image preview ── */
+    .cover-preview:not(:empty) {
+      margin-top: var(--space-3);
+    }
+    .cover-thumb {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      display: block;
+      border-radius: var(--radius-card);
+    }
+
     /* ── Setlist ── */
     .song-row {
       display: flex;
@@ -557,6 +628,13 @@ function collectPhotos(root: ShadowRoot | null): string[] {
   )
     .map((img) => img.dataset.url || "")
     .filter(Boolean);
+}
+
+function collectCover(root: ShadowRoot | null): string {
+  const img = root?.querySelector(
+    "[data-cover-preview] img"
+  ) as HTMLImageElement | null;
+  return img?.dataset.url || "";
 }
 
 function formatDisplayDate(yyyyMmDd: string): string {

@@ -34,7 +34,9 @@ export class ShowViewElement extends HTMLElement {
       return html`
         <a class="back-link" href="/app">← All concerts</a>
 
-        <div class="hero" aria-hidden="true"></div>
+        ${s.coverImage
+          ? html`<img class="hero" src=${s.coverImage} alt="" />`
+          : html`<div class="hero" aria-hidden="true"></div>`}
 
         <div class="title-block">
           <div class="title-left">
@@ -160,6 +162,8 @@ export class ShowViewElement extends HTMLElement {
     .hero {
       width: 100%;
       height: 300px;
+      object-fit: cover;
+      display: block;
       background: linear-gradient(135deg, var(--color-surface) 0%, #c4ae8f 100%);
       border-radius: var(--radius-card);
       margin-bottom: var(--space-4);

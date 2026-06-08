@@ -13,7 +13,8 @@ const showSchema = new Schema<Show>(
     songs: [String],
     memoryText: String,
     rating: Number,
-    photos: [String]
+    photos: [String],
+    coverImage: String
   },
   { collection: "concerto_shows" }
 );
