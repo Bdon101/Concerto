@@ -12,7 +12,8 @@ const showSchema = new Schema<Show>(
     artistName: String,
     songs: [String],
     memoryText: String,
-    rating: Number
+    rating: Number,
+    photos: [String]
   },
   { collection: "concerto_shows" }
 );

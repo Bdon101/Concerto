@@ -9,4 +9,5 @@ export interface Show {
   songs?: string[];
   memoryText?: string;
   rating?: number;
+  photos?: string[];
 }

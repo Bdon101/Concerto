@@ -12,6 +12,9 @@ dist
 proto.log
 nohup.out
 
+# User-uploaded images (written at runtime, not source)
+packages/server/uploads/
+
 # Local Claude / dev tooling
 .claude/
 .playwright-cli/
