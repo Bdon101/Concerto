@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import { Show } from "../models/index.ts";
+import { deleteImageByUrl } from "../routes/images.ts";
 
 const showSchema = new Schema<Show>(
   {
@@ -54,15 +55,34 @@ function create(json: Show, owner: string): Promise<Show> {
   return s.save();
 }
 
+// All image URLs a show references (cover + gallery photos).
+function imageUrls(show: Show): string[] {
+  const urls: string[] = [];
+  if (show.coverImage) urls.push(show.coverImage);
+  if (show.photos) urls.push(...show.photos);
+  return urls;
+}
+
 // Owner-only: shared viewers are read-only, so a non-owner match yields none.
+// On save, any image the show no longer references (a removed photo or a
+// replaced cover) is deleted from disk so uploads don't accumulate.
 function update(id: string, show: Show, owner: string): Promise<Show> {
-  return ShowModel.findOneAndUpdate(
-    { id, ownerUsername: owner },
-    stripProtected(show),
-    { new: true }
-  ).then((updated) => {
-    if (!updated) throw `${id} not updated`;
-    return updated as Show;
+  return ShowModel.findOne({ id, ownerUsername: owner }).then((existing) => {
+    if (!existing) throw `${id} not updated`;
+    const oldUrls = imageUrls(existing as Show);
+
+    return ShowModel.findOneAndUpdate(
+      { id, ownerUsername: owner },
+      stripProtected(show),
+      { new: true }
+    ).then((updated) => {
+      if (!updated) throw `${id} not updated`;
+      const stillUsed = new Set(imageUrls(updated as Show));
+      const removed = oldUrls.filter((url) => !stillUsed.has(url));
+      // Fire-and-forget: don't block the response on disk cleanup.
+      removed.forEach((url) => void deleteImageByUrl(url));
+      return updated as Show;
+    });
   });
 }
 

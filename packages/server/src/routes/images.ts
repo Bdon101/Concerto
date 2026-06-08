@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { randomUUID } from "node:crypto";
-import { writeFile } from "node:fs/promises";
+import { writeFile, unlink } from "node:fs/promises";
 import path from "node:path";
 
 // Where uploaded image bytes are written. Served back out via
@@ -8,6 +8,18 @@ import path from "node:path";
 export const IMAGES_DIR = path.resolve(
   process.env.IMAGES_DIR || "uploads/images"
 );
+
+// Delete an uploaded image file given its public URL (e.g. "/images/<uuid>.jpg").
+// Ignores anything that isn't a local /images/ path and guards against path
+// traversal by using only the basename. Missing/already-gone files are a no-op.
+export function deleteImageByUrl(url: string | undefined): Promise<void> {
+  if (!url || !url.startsWith("/images/")) return Promise.resolve();
+  const name = path.basename(url);
+  if (!name || name === "." || name === "..") return Promise.resolve();
+  return unlink(path.join(IMAGES_DIR, name)).catch(() => {
+    // File may already be gone; nothing to clean up.
+  });
+}
 
 // Allowed content types mapped to the extension we save under.
 const EXT_BY_TYPE: Record<string, string> = {
