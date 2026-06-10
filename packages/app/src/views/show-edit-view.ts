@@ -17,6 +17,7 @@ export class ShowEditViewElement extends HTMLElement {
   static observedAttributes = ["show-id"];
 
   private songCount = 0;
+  private memoryObserver?: MutationObserver;
 
   viewModel = createViewModel<EditVM>({})
     .with(fromStore<Model>(this), "show");
@@ -104,7 +105,6 @@ export class ShowEditViewElement extends HTMLElement {
                 name="memoryText"
                 rows="6"
                 placeholder="What do you remember about this night?"
-                .value=${s.memoryText ?? ""}
               ></textarea>
             </section>
 
@@ -281,6 +281,32 @@ export class ShowEditViewElement extends HTMLElement {
 
   connectedCallback() {
     this.maybeRequest();
+    this.startMemoryPrefill();
+  }
+
+  disconnectedCallback() {
+    this.memoryObserver?.disconnect();
+  }
+
+  // The framework can't reliably set a <textarea>'s value through the
+  // template (textarea content is RCDATA and `.value=` only binds for
+  // function params), so prefill it imperatively once the form renders.
+  private startMemoryPrefill() {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const prefill = () => {
+      const ta = root.querySelector(
+        'textarea[name="memoryText"]'
+      ) as HTMLTextAreaElement | null;
+      if (!ta || ta.dataset.prefilled === "1") return;
+      const memory = (this.viewModel.toObject() as EditVM).show?.memoryText;
+      if (!memory) return;
+      ta.value = memory;
+      ta.dataset.prefilled = "1";
+    };
+    this.memoryObserver = new MutationObserver(prefill);
+    this.memoryObserver.observe(root, { childList: true, subtree: true });
+    prefill();
   }
 
   private maybeRequest() {
